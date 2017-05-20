@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="display-3">Web Crawler</h1>
+        <p>TLorem ipsum dolor sit amet, consectetur adipiscing elit. Donec egestas nisl nibh, eget fringilla ex vestibulum non. Proin sit amet purus quis nunc tincidunt commodo sit amet at ex. Vivamus bibendum eros in sapien cursus tincidunt. Nunc pharetra hendrerit est quis ultricies. Cras in volutpat nunc. Maecenas ornare, justo ac egestas varius, mauris felis posuere justo, non viverra turpis odio eu dui. Proin maximus hendrerit orci, non vehicula odio gravida sit amet. Proin tristique, leo at cursus semper, lorem diam eleifend lacus, pulvinar malesuada lacus quam in sapien. Integer ornare egestas velit ac bibendum.</p>
+      </div>
+    </div>
+      
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <form>
+            <div class="form-group row" style="display: none">
+              <label for="pastSearchesDD" class="col-sm-2 col-form-label">Past Searches</label>
+              <select id="pastSerchesDD" class="col-sm-4 form-control">
+                <option>None</option>
+              </select>
+            </div>
+            <div class="form-group row">
+              <label for="startingURL" class="col-sm-2 col-form-label">Starting URL</label>
+              <input class="col-sm-4 form-control" type="url" placeholder="https://example.com" id="url">
+              <label for="searchType" class="col-sm-2 col-form-label">Search Type</label>
+              <select id="searchType" class="col-sm-4 form-control">
+                <option></option>
+                <option>Depth</option>
+                <option>Breadth</option>
+              </select>
+            </div>
+            <div class="form-group row">
+              <label for="searchLimit" class="col-sm-2 col-form-label">Max Number</label>
+              <input id="searchLimit" class="col-sm-4 form-control" type="number" placeholder="0" min="0">
+              <label for="searchKeyword" class="col-sm-2 col-form-label">Keyword</label>
+              <input id="searchKeyword" class="col-sm-4 form-control" type="text" placeholder="Keyword">
+            </div>
+            <div>
+              <button type="button" class="btn btn-primary col-sm-2" id="submitSearch">Search!</button>
+            </div>
+          </form> 
+        </div>        
+      </div>
+      <div class="row" id="chartArea">
+        <!-- d3 chart will go here -->
+      </div>
+    </div>
+	
+	<!-- Scripts for d3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.8.0/d3.min.js" integrity="sha256-SG9O7IpJWlIha5Q8UIqaLFkkimE+CbubKlzSwTbdS1g=" crossorigin="anonymous"></script>
+
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/cookieParser.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/submitForm.js') }}"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>
+        <script type="text/javascript" charset="utf-8">
+
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+            socket.on('connect', function(data)
+             {
+                console.log("Connected to server.");
+             });
+
+
+        </script>
+
+{% endblock %}
+		

@@ -15,7 +15,6 @@ import string
 import json
 
 import validators
-from urllib import parse
 
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
@@ -35,10 +34,12 @@ app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_uppercase + string
 # Wrap the flask app with the flask socket io
 io = SocketIO(app, engineio_logger=True, ping_timeout=7200)
 
+
 @app.route('/')
 def index():
     """Index Page"""
     return render_template("index.html")
+
 
 @app.route("/cookie_handler")
 def cookie_handler():
@@ -56,7 +57,6 @@ def cookie_handler():
 
     # Validate Inputs
     if not validators.url(url):
-        print("FUCK")
         response.status_code = 400
         return response
 

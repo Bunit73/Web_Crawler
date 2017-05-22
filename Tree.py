@@ -20,10 +20,16 @@ class Node(object):
         return len(self.children)
 
     def get_max_depth(self):
-        return get_depth(self)
+        max_depth = 0
+        for c in self.children:
+            max_depth = max(max_depth, c.get_max_depth())
+        return max_depth + 1
 
     def get_node_count(self):
-        return get_node_count(self)
+        count = 0
+        for c in self.children:
+            count += c.get_node_count()
+        return count + 1
 
     def add_to_tree(self, root, child, comment=''):
         """Depth First Pre-Order Tree Traversal"""
@@ -49,23 +55,3 @@ class Node(object):
             data['children'].append(c.make_json())
         return data
 
-
-def get_depth(node):
-    if node is None:
-        return 0
-    else:
-        max_depth = 0
-        for c in node.children:
-            max_depth = max(max_depth, get_depth(c))
-
-    return max_depth + 1
-
-
-def get_node_count(node):
-    if node is None:
-        return 0
-    else:
-        count = 0
-        for c in node.children:
-            count += get_node_count(c)
-    return count + 1

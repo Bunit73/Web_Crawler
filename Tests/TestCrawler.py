@@ -14,7 +14,7 @@ class TreeGenericCrawler(unittest.TestCase):
 
 class BFSCrawler(unittest.TestCase):
     def test_object(self):
-        b = Crawler.Breadth("http://web.engr.oregonstate.edu/~mjb/cs575e/", 1000)
+        b = Crawler.Breadth("https://wsj.com", 500)
         b.search()
 
 

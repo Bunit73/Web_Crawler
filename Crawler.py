@@ -26,7 +26,6 @@ class SearchGeneric(object):
     def append_node(self, root, child, comment=''):
         if root != child:
             self.tree.add_to_tree(root, child, comment)
-        return
 
 
 class Breadth(SearchGeneric):
@@ -50,7 +49,7 @@ class Breadth(SearchGeneric):
                 req = urllib.request.Request(url['url'], data=None, headers={
                     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko)\
                      Chrome/35.0.1916.47 Safari/537.36'})
-                # req = urllib.request.Request(url['url'])
+
                 try:
                     page_data = urllib.request.urlopen(req)
                 except urllib.error.HTTPError:
@@ -64,8 +63,10 @@ class Breadth(SearchGeneric):
                     for link in soup.find_all('a', href=True):
                         self.queue.append({'root': url['url'], 'url': link['href']})
 
-                    # append the node to the tree
-                    self.append_node(url['root'], url['url'])
+                    comment = ''
+
+                # append the node to the tree
+                self.append_node(url['root'], url['url'], comment)
 
                 self.limit = self.limit - 1
 
@@ -80,7 +81,41 @@ class Depth(SearchGeneric):
     """
     def __init__(self, root_url, limit):
         super().__init__(root_url, limit)
-        self.stack = []
+        self.stack = [{'root': root_url, 'url': root_url}]
 
-    def search(self, root_url):
-        pass
+    def search(self):
+        while (len(self.stack) != 0) & (self.limit > 0):
+            url = self.stack.pop(0)
+            if self.test_url_is_absolute(url['url']) is False:
+                url['url'] = urllib.parse.urljoin(url['root'], url['url'])
+
+            if (validators.url(url['url']) is True) & (url not in self.visited):
+                self.visited.append(url)
+                # change the header so sites dont kick the python header
+                req = urllib.request.Request(url['url'], data=None, headers={
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko)\
+                     Chrome/35.0.1916.47 Safari/537.36'})
+
+                try:
+                    page_data = urllib.request.urlopen(req)
+                except urllib.error.HTTPError:
+                    page_data = None
+                    comment = 'Denied Access'
+
+                if page_data is not None:
+                    soup = BeautifulSoup(page_data.read(), "html.parser")
+
+                    # add links to queue
+                    for link in soup.find_all('a', href=True):
+                        self.stack.insert(0,{'root': url['url'], 'url': link['href']})
+
+                    comment = ''
+
+                # append the node to the tree
+                self.append_node(url['root'], url['url'], comment)
+
+                self.limit = self.limit - 1
+
+            else:
+                self.stack.pop(0)
+            self.search()

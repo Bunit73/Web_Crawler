@@ -9,6 +9,9 @@ class Node(object):
     def __str__(self):
         pass
 
+    def get_name(self):
+        return self.name
+
     def add_child(self, obj):
         self.children.append(obj)
 
@@ -20,6 +23,21 @@ class Node(object):
 
     def get_node_count(self):
         return get_node_count(self)
+
+    def add_to_tree(self,root,child):
+        """Depth First Pre-Order Tree Traversal"""
+        if child is None:
+            return
+        stack = []
+        stack.append(self)
+        while len(stack) > 0:
+            node = stack.pop()
+            if node.get_name() == root:
+                node.add_child(Node(child))
+                return
+            if len(node.children) > 0:
+                for c in node.children:
+                    stack.append(c)
 
 
 def get_depth(node):
@@ -43,25 +61,25 @@ def get_node_count(node):
     return count + 1
 
 
-def add_child_to_spot(node, spot):
-    """Depth First Pre-Order Tree Traversal"""
-    if node is None:
-        return
-    stack = []
-    stack.append(node)
-    counter = 0
-    while len(stack) > 0:
-
-        if counter == spot:
-            global names
-            names = names +1
-            node.add_child(Node(names))
-            return
-        counter += 1
-        node = stack.pop()
-        if len(node.children) > 0:
-            for c in node.children:
-                stack.append(c)
+# def add_child_to_spot(node, spot):
+#     """Depth First Pre-Order Tree Traversal"""
+#     if node is None:
+#         return
+#     stack = []
+#     stack.append(node)
+#     counter = 0
+#     while len(stack) > 0:
+#
+#         if counter == spot:
+#             global names
+#             names = names +1
+#             node.add_child(Node(names))
+#             return
+#         counter += 1
+#         node = stack.pop()
+#         if len(node.children) > 0:
+#             for c in node.children:
+#                 stack.append(c)
 
 
 def make_json(node):

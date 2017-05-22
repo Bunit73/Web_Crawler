@@ -2,8 +2,9 @@
 
 # http://stackoverflow.com/questions/2482602/a-general-tree-implementation-in-python
 class Node(object):
-    def __init__(self, data):
+    def __init__(self, data, comment=''):
         self.name = data
+        self.comment = comment
         self.children = []
 
     def __str__(self):
@@ -24,20 +25,29 @@ class Node(object):
     def get_node_count(self):
         return get_node_count(self)
 
-    def add_to_tree(self,root,child):
+    def add_to_tree(self, root, child, comment=''):
         """Depth First Pre-Order Tree Traversal"""
         if child is None:
             return
-        stack = []
+        stack = list()
         stack.append(self)
         while len(stack) > 0:
             node = stack.pop()
             if node.get_name() == root:
-                node.add_child(Node(child))
+                node.add_child(Node(child, comment))
                 return
             if len(node.children) > 0:
                 for c in node.children:
                     stack.append(c)
+
+    def make_json(self):
+        data = {
+            'name': self.name,
+            'children': []
+        }
+        for c in self.children:
+            data['children'].append(c.make_json())
+        return data
 
 
 def get_depth(node):
@@ -59,38 +69,3 @@ def get_node_count(node):
         for c in node.children:
             count += get_node_count(c)
     return count + 1
-
-
-# def add_child_to_spot(node, spot):
-#     """Depth First Pre-Order Tree Traversal"""
-#     if node is None:
-#         return
-#     stack = []
-#     stack.append(node)
-#     counter = 0
-#     while len(stack) > 0:
-#
-#         if counter == spot:
-#             global names
-#             names = names +1
-#             node.add_child(Node(names))
-#             return
-#         counter += 1
-#         node = stack.pop()
-#         if len(node.children) > 0:
-#             for c in node.children:
-#                 stack.append(c)
-
-
-def make_json(node):
-    if node is None:
-        return {}
-    else:
-        data = {
-            'name': node.name,
-            'children': []
-        }
-        for c in node.children:
-            data['children'].append(make_json(c))
-
-    return data

@@ -14,18 +14,26 @@ class Node(object):
         return self.name
 
     def add_child(self, obj):
-        self.children.append(obj)
+        """Adds a child to the node list"""
+        if type(obj) is Node:
+            self.children.append(obj)
+        else:
+            raise Exception("Only Nodes can be appended")
+
 
     def children_length(self):
+        """Returns the count of children node hass"""
         return len(self.children)
 
     def get_max_depth(self):
+        """Returns count of nodes in deepest branch"""
         max_depth = 0
         for c in self.children:
             max_depth = max(max_depth, c.get_max_depth())
         return max_depth + 1
 
     def get_node_count(self):
+        """Returns total count of nodes"""
         count = 0
         for c in self.children:
             count += c.get_node_count()
@@ -47,6 +55,7 @@ class Node(object):
                     stack.append(c)
 
     def make_json(self):
+        """Returns a JSON like object representation of the tree"""
         data = {
             'name': self.name,
             'children': []
@@ -54,4 +63,3 @@ class Node(object):
         for c in self.children:
             data['children'].append(c.make_json())
         return data
-

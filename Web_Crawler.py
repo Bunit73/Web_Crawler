@@ -16,6 +16,9 @@ import json
 
 import validators
 
+import ClientSocket
+import Crawler
+
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 from gevent import monkey
@@ -116,6 +119,13 @@ def connected():
     """Handle Socket Connection"""
     emit('conn response', {'msg': 'Connected'})
 
+
+@io.on('random tree')
+def handle_numbers():
+    #  https://github.com/miguelgrinberg/Flask-SocketIO/issues/371
+    client = ClientSocket.Socket(io, request.sid)
+    crawler = Crawler.Breadth("http://motherfuckingwebsite.com", 30, client)
+    crawler.search('socket')
 
 if __name__ == "__main__":
     io.run(app, 'localhost', 5000, debug=True)

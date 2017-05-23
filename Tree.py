@@ -8,7 +8,7 @@ class Node(object):
         self.children = []
 
     def __str__(self):
-        pass
+        print("FUCKER")
 
     def get_name(self):
         return self.name
@@ -20,9 +20,8 @@ class Node(object):
         else:
             raise Exception("Only Nodes can be appended")
 
-
     def children_length(self):
-        """Returns the count of children node hass"""
+        """Returns the count of children node has"""
         return len(self.children)
 
     def get_max_depth(self):
@@ -58,6 +57,7 @@ class Node(object):
         """Returns a JSON like object representation of the tree"""
         data = {
             'name': self.name,
+            'comment': self.comment,
             'children': []
         }
         for c in self.children:

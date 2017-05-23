@@ -121,11 +121,18 @@ def connected():
 
 
 @io.on('random tree')
-def handle_numbers():
-    #  https://github.com/miguelgrinberg/Flask-SocketIO/issues/371
+def handle_numbers(obj=None):
     client = ClientSocket.Socket(io, request.sid)
-    crawler = Crawler.Breadth("http://motherfuckingwebsite.com", 30, client)
-    crawler.search('socket')
+    #  https://github.com/miguelgrinberg/Flask-SocketIO/issues/371
+    if obj['type'] == 'Breadth':
+        crawler = Crawler.Breadth(obj['url'], int(obj['number']), client)
+        crawler.search('socket')
+    elif obj['type'] == 'Depth':
+        crawler = Crawler.Depth(obj['url'], int(obj['number']), client)
+        crawler.search('socket')
+    else:
+        client.emit("Error", "Bad Data")
+
 
 if __name__ == "__main__":
     io.run(app, 'localhost', 5000, debug=True)

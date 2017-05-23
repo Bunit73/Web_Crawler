@@ -24,21 +24,10 @@ class Socket:
             p = Process(target=self.run())
             p.start()
 
-    # def run(self):
-    #     """Stream of data to client"""
-    #     while True:
-    #         self.emit('message', "NA")
-    #         self.io.sleep(1)
 
-    # for random tree example
     def run(self):
         pass
         """ Creates a random n-ary tree for 30 seconds"""
-        # while number < 30:
-        #     number = number + 1
-        #     # makeTree.add_child_to_spot(n, makeTree.find_random_node(n))
-        #     # self.emit('message', makeTree.make_json(n))
-        #     self.io.sleep(.25)
 
     def emit(self, event, data):
         """ 

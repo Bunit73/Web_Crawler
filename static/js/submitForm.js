@@ -18,17 +18,19 @@ function submitSearch() {
             const number = $("#searchLimit").val();
             const keyword = $("#searchKeyword").val();
 
-            $.ajax({
-                url:"/cookie_handler",
-                method:'GET',
-                data:{
+            data = {
                     url: url,
                     type: type,
                     number: number,
                     keyword: keyword
-                },
+                }
+
+            $.ajax({
+                url:"/cookie_handler",
+                method:'GET',
+                data: data,
                 success: function () {
-                    socket.emit('random tree');
+                    socket.emit('random tree',data);
                     parsePastSearchesCookie();
                 },
                 error: function () {

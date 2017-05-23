@@ -3,25 +3,24 @@ import urllib.request
 import urllib.parse
 import urllib.error
 
-from time import sleep
+from time import sleep, time
 
 import validators
 
 import Tree
-import ClientSocket
 
 
 class SearchGeneric(object):
     """
     Generic Crawler Class
     """
-    def __init__(self, root_url, limit=1, socket=None):
+    def __init__(self, root_url, limit=1, client_socket=None):
         self.root_url = root_url
         self.tree = Tree.Node(root_url)
         self.limit = limit
         self.visited = []
         self.sleep_time = 0.5
-        self.socket = socket
+        self.socket = client_socket
 
     def validate_url(self):
         return validators.url(self.root_url)
@@ -33,15 +32,21 @@ class SearchGeneric(object):
         if root != child:
             self.tree.add_to_tree(root, child, comment)
 
-    def write_log(self):
-        pass
+    def write_log(self, root_url=None, current_url=None, status_code=404, elapsed_time=0):
+        # if root_url is not None:
+        #     rootip = socket.gethostbyname(root_url)
+        # if current_url is not None:
+        #     destip = socket.gethostbyname(current_url)
+
+        log_str = "Root: {}  --> Child: {}  Status: {} Elapsed Time: {}".format(root_url, current_url, status_code, elapsed_time)
+        return log_str
 
     def print_to_console(self):
         print(self.tree.make_json())
 
-    def socket_output(self):
+    def socket_output(self, log_string=''):
         output = {'tree': self.tree.make_json(),
-                  'log': 'log data',
+                  'log': log_string,
                   'final': 'no'
                   }
         self.socket.emit('message', output)
@@ -70,7 +75,11 @@ class Breadth(SearchGeneric):
                      Chrome/35.0.1916.47 Safari/537.36'})
 
                 try:
+                    elapsed_time = 0
+                    start_time = time()
                     page_data = urllib.request.urlopen(req)
+                    end_time = time()
+                    elapsed_time = end_time - start_time
                 except urllib.error.HTTPError:
                     page_data = None
                     comment = 'Denied Access'
@@ -90,7 +99,12 @@ class Breadth(SearchGeneric):
                 if emit == 'console':
                     self.print_to_console()
                 elif emit == 'socket':
-                    self.socket_output()
+                    status_code = None
+                    if page_data is not None:
+                        status_code = page_data.getcode()
+
+                    log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time)
+                    self.socket_output(log_str)
 
                 self.limit = self.limit - 1
 
@@ -116,6 +130,7 @@ class Depth(SearchGeneric):
     def search(self, emit=None):
         while (len(self.stack) != 0) & (self.limit > 0):
             url = self.stack.pop(0)
+
             if self.test_url_is_absolute(url['url']) is False:
                 url['url'] = urllib.parse.urljoin(url['root'], url['url'])
 
@@ -127,12 +142,17 @@ class Depth(SearchGeneric):
                      Chrome/35.0.1916.47 Safari/537.36'})
 
                 try:
+                    elapsed_time = 0
+                    start_time = time()
                     page_data = urllib.request.urlopen(req)
+                    end_time = time()
+                    elapsed_time = end_time - start_time
                 except urllib.error.HTTPError:
                     page_data = None
                     comment = 'Denied Access'
 
                 if page_data is not None:
+
                     soup = BeautifulSoup(page_data.read(), "html.parser")
 
                     # add links to queue
@@ -147,7 +167,12 @@ class Depth(SearchGeneric):
                 if emit == 'console':
                     self.print_to_console()
                 elif emit == 'socket':
-                    self.socket_output()
+                    status_code = None
+                    if page_data is not None:
+                        status_code = page_data.getcode()
+
+                    log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time)
+                    self.socket_output(log_str)
 
                 self.limit = self.limit - 1
 

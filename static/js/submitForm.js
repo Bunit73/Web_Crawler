@@ -31,6 +31,8 @@ function submitSearch() {
                 data: data,
                 success: function () {
                     socket.emit('random tree',data);
+                    fadeOutForm();
+                    showProgressBar();
                     parsePastSearchesCookie();
                 },
                 error: function () {

@@ -30,6 +30,7 @@ body{
 }
 
 .progress-bar{
+    display: none;
     background-color: #607D8B;
 }
 

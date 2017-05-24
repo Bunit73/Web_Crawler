@@ -12,5 +12,12 @@ function updateProgressBar(value) {
     newWidth = value + "%";
     $("#progress-bar-row").animate({width:newWidth},400);
     $("#progress-bar-row").attr("aria-valuenow",value);
+}
 
+function showProgressBar() {
+    $("#progress-bar-row").fadeIn();
+}
+
+function fadeOutForm() {
+    $("#input-form").fadeOut();
 }

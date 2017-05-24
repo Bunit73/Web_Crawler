@@ -18,6 +18,7 @@ class SearchGeneric(object):
         self.root_url = root_url
         self.tree = Tree.Node(root_url)
         self.limit = limit
+        self.org_limit = limit
         self.visited = []
         self.sleep_time = 0.5
         self.socket = client_socket
@@ -45,9 +46,18 @@ class SearchGeneric(object):
         print(self.tree.make_json())
 
     def socket_output(self, log_string=''):
+
+        if self.limit - 1 > 0:
+            progress = len(self.visited)/self.org_limit * 100
+            final = False
+        else:
+            progress = 100
+            final = True
+
         output = {'tree': self.tree.make_json(),
                   'log': log_string,
-                  'final': 'no'
+                  'progress': progress,
+                  'final': final
                   }
         self.socket.emit('message', output)
 

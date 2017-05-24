@@ -3,8 +3,6 @@
 <head>
     <title>Web Crawler - Volans</title>
 
-      <!-- Followed the Jumbotron Example from: https://v4-alpha.getbootstrap.com/examples/ -->
-
       <!--Bootstrap-->
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -27,13 +25,17 @@
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
-      <span class="navbar-brand">Webcrawler - Volans</span>
+  <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top nav-header">
+      <span class="navbar-brand">Webcrawler</span>
   </nav>
 
 
 	{% block content %}
 	{% endblock %}
-
+    <footer class="footer">
+        <div class="container">
+            <span>Place sticky footer content here.</span>
+      </div>
+    </footer>
 </body>
 </html>

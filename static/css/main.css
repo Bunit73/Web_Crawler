@@ -23,6 +23,12 @@ body{
     border-color: #546E7A;
 }
 
+#searchAgainBtn{
+    display: none;
+    background-color: #546E7A;
+    border-color: #546E7A;
+}
+
 .active {
     webkit-animation: progress-bar-stripes .5s linear infinite;
     -o-animation: progress-bar-stripes .5s linear infinite;

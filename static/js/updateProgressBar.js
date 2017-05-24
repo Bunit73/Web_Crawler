@@ -18,6 +18,14 @@ function showProgressBar() {
     $("#progress-bar-row").fadeIn();
 }
 
+function fadeProgressBar() {
+    $("#progress-bar-row").fadeOut();
+}
+
+function fadeInForm() {
+    $("#input-form").fadeIn();
+}
+
 function fadeOutForm() {
     $("#input-form").fadeOut();
 }

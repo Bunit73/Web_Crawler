@@ -116,8 +116,19 @@ function validateKeyword(keywordInput) {
     return false;
 }
 
+function showSearchAgainBtn() {
+    $("#searchAgainBtn").fadeIn();
+}
+
+function newSearchStart() {
+    $("#searchAgainBtn").on('click',function () {
+        fadeInForm();
+        $("#searchAgainBtn").fadeOut();
+    })
+}
 
 $(document).ready(function () {
     //Bind the search button
     submitSearch();
+    newSearchStart();
 });

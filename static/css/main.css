@@ -1,4 +1,4 @@
-/*https://broker.gotoassist.com/h/sap-full-control?Question=DR190-921-412*/
+/*https://material.io/guidelines/style/color.html*/
 .nav-header{
     background-color: #263238;
 }
@@ -43,6 +43,24 @@ body{
 
 .center {
     text-align: center;
+}
+
+.tabs{
+    margin-top: 25px;
+}
+
+.active-tab{
+    background-color: #263238;
+    color: #ffffff;
+}
+
+.inactive-tab{
+    background-color: #CFD8DC;
+}
+
+#log-text{
+    height: 700px;
+    overflow: scroll;
 }
 
 .footer {

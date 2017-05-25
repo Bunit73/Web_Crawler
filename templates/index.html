@@ -33,9 +33,24 @@
           </form> 
         </div>        
       </div>
+    </div>
+    <div class="container">
       <div class="row progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%" id="progress-bar-row"></div>
       <div class="row">
           <button id="searchAgainBtn" class="btn btn-primary col-sm-2">Stuff</button>
+      </div>
+      <div class="row tabs">
+          <div class="col-xs-6 col-sm-6 text-center active-tab">
+                Node Graph
+          </div>
+          <div class="col-xs-6 col-sm-6 text-center inactive-tab">
+                Log
+          </div>
+      </div>
+      <div class="row" id="log-area">
+          <code class="d-flex align-items-start col-sm-12 flex-column" id="log-text">
+
+          </code>
       </div>
       <div class="row" id="chartArea">
         <!-- d3 chart will go here -->
@@ -48,6 +63,7 @@
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/cookieParser.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/submitForm.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/updateTextArea.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/updateProgressBar.js') }}"></script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>
@@ -62,6 +78,7 @@
             socket.on('message',function (data) {
                 console.log(data);
                 updateProgressBar(data.progress);
+                appendNewLine(data.log);
                 if(data.final){
                     fadeProgressBar();
                     showSearchAgainBtn();

@@ -35,11 +35,7 @@ class SearchGeneric(object):
             self.tree.add_to_tree(root, child, comment)
 
     def write_log(self, root_url=None, current_url=None, status_code=404, elapsed_time=0, comment=''):
-        # if root_url is not None:
-        #     rootip = socket.gethostbyname(root_url)
-        # if current_url is not None:
-        #     destip = socket.gethostbyname(current_url)
-
+        """Creates log string"""
         if comment == '':
             log_str = "Root: {}  --> Child: {}  Status: {} Elapsed Time: {}".format(root_url, current_url, status_code,
                                                                                     elapsed_time)

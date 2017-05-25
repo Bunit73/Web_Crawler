@@ -14,8 +14,9 @@ class SearchGeneric(object):
     """
     Generic Crawler Class
     """
-    def __init__(self, root_url, limit=1, client_socket=None):
+    def __init__(self, root_url, limit=1, keyword='', client_socket=None):
         self.root_url = root_url
+        self.keyword = keyword
         self.tree = Tree.Node(root_url)
         self.limit = limit
         self.org_limit = limit
@@ -33,19 +34,25 @@ class SearchGeneric(object):
         if root != child:
             self.tree.add_to_tree(root, child, comment)
 
-    def write_log(self, root_url=None, current_url=None, status_code=404, elapsed_time=0):
+    def write_log(self, root_url=None, current_url=None, status_code=404, elapsed_time=0, comment=''):
         # if root_url is not None:
         #     rootip = socket.gethostbyname(root_url)
         # if current_url is not None:
         #     destip = socket.gethostbyname(current_url)
 
-        log_str = "Root: {}  --> Child: {}  Status: {} Elapsed Time: {}".format(root_url, current_url, status_code, elapsed_time)
+        if comment == '':
+            log_str = "Root: {}  --> Child: {}  Status: {} Elapsed Time: {}".format(root_url, current_url, status_code,
+                                                                                    elapsed_time)
+        else:
+            log_str = "Root: {}  --> Child: {}  Status: {} Elapsed Time: {} Note: {}".format(root_url, current_url,
+                                                                                    status_code, elapsed_time, comment)
+
         return log_str
 
     def print_to_console(self):
         print(self.tree.make_json())
 
-    def socket_output(self, log_string=''):
+    def socket_output(self, log_string='', status='OK'):
 
         if self.limit - 1 > 0:
             progress = len(self.visited)/self.org_limit * 100
@@ -57,21 +64,43 @@ class SearchGeneric(object):
         output = {'tree': self.tree.make_json(),
                   'log': log_string,
                   'progress': progress,
+                  'status': status,
                   'final': final
                   }
         self.socket.emit('message', output)
+
+    def search_for_key_word(self, soup):
+        """Searches For A Key Word In BS4 Soup Object
+        @:param soup 
+        @:return {bool}
+        Reference:
+            https://stackoverflow.com/questions/2957013/beautifulsoup-just-get-inside-of-a-tag-no-matter-how-many-enclosing-tags-there
+        """
+        keyword_on_page = False
+
+        text = soup.find_all(text=True)
+        for phrase in text:
+            if self.keyword in phrase:
+                keyword_on_page = True
+
+        return keyword_on_page
 
 
 class Breadth(SearchGeneric):
     """
     Breadth Crawler
     """
-    def __init__(self, root_url, limit, socket):
-        super().__init__(root_url, limit, socket)
+    def __init__(self, root_url, limit, keyword, socket):
+        super().__init__(root_url, limit, keyword, socket)
         self.queue = [{'root': root_url, 'url': root_url}]
 
     def search(self, emit=None):
         while (len(self.queue) != 0) & (self.limit > 0):
+            elapsed_time = 0
+            comment = ''
+            keyword_found = False
+            error = False
+
             url = self.queue.pop(0)
 
             if self.test_url_is_absolute(url['url']) is False:
@@ -85,7 +114,6 @@ class Breadth(SearchGeneric):
                      Chrome/35.0.1916.47 Safari/537.36'})
 
                 try:
-                    elapsed_time = 0
                     start_time = time()
                     page_data = urllib.request.urlopen(req)
                     end_time = time()
@@ -93,15 +121,19 @@ class Breadth(SearchGeneric):
                 except urllib.error.HTTPError:
                     page_data = None
                     comment = 'Denied Access'
+                    error = True
 
                 if page_data is not None:
                     soup = BeautifulSoup(page_data.read(), "html.parser")
+                    self.search_for_key_word(soup)
+
+                    if self.search_for_key_word(soup):
+                        comment = 'Keyword found'
+                        keyword_found = True
 
                     # add links to queue
                     for link in soup.find_all('a', href=True):
                         self.queue.append({'root': url['url'], 'url': link['href']})
-
-                    comment = ''
 
                 # append the node to the tree
                 self.append_node(url['root'], url['url'], comment)
@@ -113,8 +145,13 @@ class Breadth(SearchGeneric):
                     if page_data is not None:
                         status_code = page_data.getcode()
 
-                    log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time)
-                    self.socket_output(log_str)
+                    log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time, comment)
+                    if error:
+                        self.socket_output(log_str, "Error")
+                    elif keyword_found:
+                        self.socket_output(log_str, "Keyword Found")
+                    else:
+                        self.socket_output(log_str)
 
                 self.limit = self.limit - 1
 
@@ -133,12 +170,17 @@ class Depth(SearchGeneric):
     """
     Depth Crawler
     """
-    def __init__(self, root_url, limit, socket):
-        super().__init__(root_url, limit, socket)
+    def __init__(self, root_url, limit, keyword, socket):
+        super().__init__(root_url, limit, keyword, socket)
         self.stack = [{'root': root_url, 'url': root_url}]
 
     def search(self, emit=None):
         while (len(self.stack) != 0) & (self.limit > 0):
+            elapsed_time = 0
+            comment = ''
+            keyword_found = False
+            error = False
+
             url = self.stack.pop(0)
 
             if self.test_url_is_absolute(url['url']) is False:
@@ -152,7 +194,6 @@ class Depth(SearchGeneric):
                      Chrome/35.0.1916.47 Safari/537.36'})
 
                 try:
-                    elapsed_time = 0
                     start_time = time()
                     page_data = urllib.request.urlopen(req)
                     end_time = time()
@@ -160,16 +201,19 @@ class Depth(SearchGeneric):
                 except urllib.error.HTTPError:
                     page_data = None
                     comment = 'Denied Access'
+                    error = True
 
                 if page_data is not None:
 
                     soup = BeautifulSoup(page_data.read(), "html.parser")
+                    if self.search_for_key_word(soup):
+                        comment = 'Keyword found'
+                        keyword_found = True
 
                     # add links to queue
                     for link in soup.find_all('a', href=True):
                         self.stack.insert(0, {'root': url['url'], 'url': link['href']})
 
-                    comment = ''
 
                 # append the node to the tree
                 self.append_node(url['root'], url['url'], comment)
@@ -181,8 +225,13 @@ class Depth(SearchGeneric):
                     if page_data is not None:
                         status_code = page_data.getcode()
 
-                    log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time)
-                    self.socket_output(log_str)
+                    log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time, comment)
+                    if error:
+                        self.socket_output(log_str, "Error")
+                    elif keyword_found:
+                        self.socket_output(log_str, "Keyword Found")
+                    else:
+                        self.socket_output(log_str)
 
                 self.limit = self.limit - 1
 

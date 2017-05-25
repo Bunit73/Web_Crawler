@@ -125,10 +125,10 @@ def handle_numbers(obj=None):
     client = ClientSocket.Socket(io, request.sid)
     #  https://github.com/miguelgrinberg/Flask-SocketIO/issues/371
     if obj['type'] == 'Breadth':
-        crawler = Crawler.Breadth(obj['url'], int(obj['number']), client)
+        crawler = Crawler.Breadth(obj['url'], int(obj['number']), str(obj['keyword']), client)
         crawler.search('socket')
     elif obj['type'] == 'Depth':
-        crawler = Crawler.Depth(obj['url'], int(obj['number']), client)
+        crawler = Crawler.Depth(obj['url'], int(obj['number']), str(obj['keyword']), client)
         crawler.search('socket')
     else:
         client.emit("Error", "Bad Data")

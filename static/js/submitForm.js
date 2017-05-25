@@ -23,7 +23,7 @@ function submitSearch() {
                     type: type,
                     number: number,
                     keyword: keyword
-                }
+                };
 
             $.ajax({
                 url:"/cookie_handler",
@@ -48,6 +48,11 @@ function submitSearch() {
  * @return {boolean} validations passed
  */
 function validateInputs() {
+    validateURL($("#url"));
+    validateSearchType($("#searchType"));
+    validateMaxNum($("#searchLimit"));
+    validateKeyword($("#searchKeyword"));
+
     return validateURL($("#url")) && validateSearchType($("#searchType")) && validateMaxNum($("#searchLimit")) && validateKeyword($("#searchKeyword"));
 }
 
@@ -116,14 +121,20 @@ function validateKeyword(keywordInput) {
     return false;
 }
 
+/**
+ * Fades in the search again button
+ */
 function showSearchAgainBtn() {
     $("#searchAgainBtn").fadeIn();
 }
 
+/**
+ * Fades in search form and hides search again button
+ */
 function newSearchStart() {
     $("#searchAgainBtn").on('click',function () {
         fadeInForm();
-        $("#searchAgainBtn").fadeOut();
+        $("#searchAgainBtn").hide();
     })
 }
 

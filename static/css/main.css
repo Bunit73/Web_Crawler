@@ -58,6 +58,10 @@ body{
     background-color: #CFD8DC;
 }
 
+.display-port{
+    margin-bottom: 250px;
+}
+
 #log-area{
     display: none;
 }
@@ -74,6 +78,12 @@ body{
 
 #log-text > p-2:nth-child(even){
     background: rgba(236, 239, 246, 1);
+}
+
+#chart{
+    height: 700px;
+    color: #212121;
+    padding: 0;
 }
 
 .footer {

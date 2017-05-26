@@ -118,6 +118,10 @@ class Breadth(SearchGeneric):
                     page_data = None
                     comment = 'Denied Access'
                     error = True
+                except:
+                    page_data = None
+                    comment = 'Error Accessing Page'
+                    error = True
 
                 if page_data is not None:
                     soup = BeautifulSoup(page_data.read(), "html.parser")

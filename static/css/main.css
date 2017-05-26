@@ -58,9 +58,18 @@ body{
     background-color: #CFD8DC;
 }
 
+#log-area{
+    display: none;
+}
+
 #log-text{
     height: 700px;
     overflow: scroll;
+    color: #212121;
+}
+
+#log-text > p-2:nth-child(even){
+    background: #BDBDBD;
 }
 
 .footer {

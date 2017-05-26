@@ -68,8 +68,12 @@ body{
     color: #212121;
 }
 
+#log-text > p-2{
+    width: 100%;
+}
+
 #log-text > p-2:nth-child(even){
-    background: #BDBDBD;
+    background: rgba(236, 239, 246, 1);
 }
 
 .footer {

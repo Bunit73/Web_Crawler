@@ -7,12 +7,17 @@ function showTextArea() {
     $("#log-area").show();
     $("#log-tab").removeClass("inactive-tab");
     $("#log-tab").addClass("active-tab");
+    $("#node-tab").addClass("inactive-tab");
+    $("#node-tab").removeClass("active-tab");
 }
 
 function hideTextArea() {
     $("#log-area").hide();
     $("#log-tab").addClass("inactive-tab");
     $("#log-tab").removeClass("active-tab");
+
+    $("#node-tab").removeClass("inactive-tab");
+    $("#node-tab").addClass("active-tab");
 }
 
 
@@ -23,5 +28,6 @@ function clearOutText() {
 $(document).ready(function () {
     $("#log-tab").on('click',function () {
         showTextArea();
+        hideChartArea()
     })
 });

@@ -57,10 +57,14 @@ class SearchGeneric(object):
             progress = 100
             final = True
 
+        node_info = self.visited[-1]
+        node_info['status'] = status
+
         output = {'tree': self.tree.make_json(),
                   'log': log_string,
                   'progress': progress,
                   'status': status,
+                  'new_node': node_info,
                   'final': final
                   }
         self.socket.emit('message', output)

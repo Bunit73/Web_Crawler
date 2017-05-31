@@ -1,27 +1,57 @@
-var treeData =
-    	{
-		"name" : "Top Level",
-		"children" : [
-		{
-			"name" : "Level 2 A",
-			"children" : [
-				{"name" : "A1"},
-				{"name" : "A2"}
-			]
-		},
-		{	"name" : "Level 2 B",
-			"children" : [
-				{"name" : "B1"},
-				{"name" : "B2"},
-				{"name" : "B3"}
-			]
-		},
-		{
-			"name" : "Level 2 C",
-			"children" : [{"name" : "C1"}]
-		}
-		]
-    	};
+var treeData = {};
+// var treeData =
+//     	{
+// 		"name" : "Top Level",
+// 		"children" : [
+// 		{
+// 			"name" : "Level 2 A",
+// 			"children" : [
+// 				{"name" : "A1"},
+// 				{"name" : "A2"}
+// 			]
+// 		},
+// 		{	"name" : "Level 2 B",
+// 			"children" : [
+// 				{"name" : "B1"},
+// 				{"name" : "B2"},
+// 				{"name" : "B3"}
+// 			]
+// 		},
+// 		{
+// 			"name" : "Level 2 C",
+// 			"children" : [{"name" : "C1"}]
+// 		}
+// 		]
+//     	};
+
+// var treeData2 =
+//     	{
+// 		"name" : "Top Level",
+// 		"children" : [
+// 		{
+// 			"name" : "Level 2 A",
+// 			"children" : [
+// 				{"name" : "A1"},
+// 				{"name" : "A2"}
+// 			]
+// 		},
+// 		{	"name" : "Level 2 B",
+// 			"children" : [
+// 				{"name" : "B1"},
+// 				{"name" : "B2"},
+// 				{"name" : "B3"}
+// 			]
+// 		},
+// 		{
+// 			"name" : "Level 2 C",
+// 			"children" : [{"name" : "C1"}]
+// 		},
+//             {
+// 			"name" : "Level 2 D",
+// 			"children" : []
+// 		}
+// 		]
+//     	};
 
 //Set canvas specs
 //Set canvas size
@@ -44,19 +74,18 @@ var svg = d3.select("#chart").append("svg")
 // https://bl.ocks.org/mbostock/2a39a768b1d4bc00a09650edef75ad39
 function zoomed() {
   var transform = d3.event.transform;
-  node.attr("transform", function(d) {
-      //console.log(d.x);
-    return "translate(" + transform.applyX(d.x) + "," + transform.applyY(d.y) + ")";
+  //transform the nodes
+    g.selectAll(".node").attr("transform", function(d) {
+        return "translate(" + transform.applyX(d.x) + "," + transform.applyY(d.y) + ")";
   });
 }
 
-// append the svg to the html chrt
-var g = svg.append("g")
-		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// append the svg to the html chart
+var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-//make the tree map object
-var treemap = d3.tree().size([width,height]);
+//make the node map object
+var nodeMap = d3.tree().size([width,height]);
 
 //links the data
 var nodes = d3.hierarchy(treeData, function(d){
@@ -64,7 +93,7 @@ var nodes = d3.hierarchy(treeData, function(d){
 });
 
 //maps the nodes the the lay out
-nodes = treemap(nodes);
+nodes = nodeMap(nodes);
 
 //add the nodes
 // adds each node as a group
@@ -72,10 +101,68 @@ var node = g.selectAll(".node")
     .data(nodes.descendants())
     .enter().append("g")
     .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
-    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .on("mouseover",function (d) {
+            console.log(d);
+    });
 
 // adds the circle to the node
 node.append("circle").attr("r", 10);
+
+
+function update(newNode) {
+    if(Object.keys(treeData).length === 0){
+        treeData = newNode;
+        nodes.data = newNode;
+        nodes.children = [];
+        nodes.id = newNode.url;
+        //console.log(nodes);
+    }
+    else{
+        //console.log(newNode);
+        //console.log(search(nodes,newNode.root));
+        var p = search(nodes,newNode.root);
+        if(p){
+            temp_node = d3.hierarchy(newNode, function(d){
+                    return d.children;
+            });
+
+            temp_node.children = [];
+            temp_node.id = newNode.url;
+            //TODO: find level for spacing
+            temp_node.x = 100;
+            temp_node.y = 200;
+            temp_node.parent = p;
+            p.children.push(temp_node);
+
+            node = g.selectAll(".node")
+                .data(p.descendants())
+                .enter().append("g")
+                .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
+                .attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")"; })
+                .on("mouseover",function (d) {
+                        console.log(d);
+                });
+
+            node.append("circle").attr("r", 10);
+
+        }
+    }
+
+}
+//https://stackoverflow.com/questions/26317004/how-to-get-web-element-id-from-the-element-position-in-d3-js-force-graph
+function search(root, id) {
+  var found;
+  function recurse(node) {
+    if (node.id === id)
+      found = node;
+    !found && node.children && node.children.forEach(function(child) {
+      recurse(child);
+    });
+  }
+  recurse(root);
+  return found;
+}
 
 //Tab functions
 function showChartArea() {
@@ -102,5 +189,23 @@ $(document).ready(function () {
     $("#node-tab").on('click',function () {
         showChartArea();
         hideTextArea();
-    })
+    });
+    //console.log(nodes)
+
+    update({'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
+            'url':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
+            'status': "Keyword Found"
+    });
+
+    function addNode() {
+        update({'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
+            'url':"test",
+            'status': "OK"
+       });
+    }
+
+        setTimeout(addNode,1000);
+
+
+
 });

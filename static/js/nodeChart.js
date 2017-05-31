@@ -36,10 +36,24 @@ var duration = 750;
 var svg = d3.select("#chart").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+                .call(d3.zoom()
+                .scaleExtent([1 / 2, 4])
+                .on("zoom", zoomed))
     .style("background-color","#f7f7f9");
 
+// https://bl.ocks.org/mbostock/2a39a768b1d4bc00a09650edef75ad39
+function zoomed() {
+  var transform = d3.event.transform;
+  node.attr("transform", function(d) {
+      //console.log(d.x);
+    return "translate(" + transform.applyX(d.x) + "," + transform.applyY(d.y) + ")";
+  });
+}
+
 // append the svg to the html chrt
-var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var g = svg.append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
 //make the tree map object
 var treemap = d3.tree().size([width,height]);
@@ -58,7 +72,7 @@ var node = g.selectAll(".node")
     .data(nodes.descendants())
     .enter().append("g")
     .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
-    .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
 // adds the circle to the node
 node.append("circle").attr("r", 10);

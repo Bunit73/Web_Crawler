@@ -4,6 +4,8 @@ var treeData = {'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
                 'status': "Keyword Found"
             };
 
+var root = {};
+
 //Set canvas specs
 //Set canvas size
 var margin = {top: 20, right: 100, bottom: 20, left: 80};
@@ -12,171 +14,56 @@ var width = 780 + margin.left + margin.right;
 var duration = 750;
 var i = 0;
 
-var treemap = d3.tree().size([height, width]);
+var tree = d3.layout.tree()
+    .size([width - 20, height - 20]);
 
-// append the svg obgect to the body of the page
-// appends a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
+var root = {},
+    nodes = tree(root);
+root.parent = root;
+root.px = root.x;
+root.py = root.y;
+var diagonal = d3.svg.diagonal();
 var svg = d3.select("#chart").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .style("background-color","#f7f7f9");
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(10,10)");
+var node = svg.selectAll(".node"),
+    link = svg.selectAll(".link");
+var duration = 750,
+    timer = setInterval(update, duration);
 
-// Assigns parent, children, height, depth
-root = d3.hierarchy(treeData, function(d) { return d.children; });
-root.x0 = 100;
-root.y0 = 100;
-
-update(root);
-
-// Collapse the node and all it's children
-function collapse(d) {
-  if(d.children) {
-    d._children = d.children
-    d._children.forEach(collapse)
-    d.children = null
-  }
-}
-
-function update(source) {
-
-  // Assigns the x and y position for the nodes
-  var treeData = treemap(root);
-
-  // Compute the new tree layout.
-  var nodes = treeData.descendants(),
-      links = treeData.descendants().slice(1);
-
-  // Normalize for fixed-depth.
-  nodes.forEach(function(d){ d.y = d.depth * 180});
-
-  // ****************** Nodes section ***************************
-
-  // Update the nodes...
-  var node = svg.selectAll('g.node')
-      .data(nodes, function(d) {return d.id || (d.id = ++i); });
-
-  // Enter any new modes at the parent's previous position.
-  var nodeEnter = node.enter().append('g')
-      .attr('class', 'node')
-      .attr("transform", function(d) {
-        return "translate(" + source.y0 + "," + source.x0 + ")";
-    })
-    .on('click', click);
-
-  // Add Circle for the nodes
-  nodeEnter.append('circle')
-      .attr('class', 'node')
-      .attr('r', 1e-6)
-      .style("fill", function(d) {
-          return d._children ? "lightsteelblue" : "#fff";
-      });
-
-  // Add labels for the nodes
-  // nodeEnter.append('text')
-  //     .attr("dy", ".35em")
-  //     .attr("x", function(d) {
-  //         return d.children || d._children ? -13 : 13;
-  //     })
-  //     .attr("text-anchor", function(d) {
-  //         return d.children || d._children ? "end" : "start";
-  //     })
-  //     .text(function(d) { return d.data.name; });
-
-  // UPDATE
-  var nodeUpdate = nodeEnter.merge(node);
-
-  // Transition to the proper position for the node
-  nodeUpdate.transition()
-    .duration(duration)
-    .attr("transform", function(d) {
-        return "translate(" + d.y + "," + d.x + ")";
-     });
-
-  // Update the node attributes and style
-  nodeUpdate.select('circle.node')
-    .attr('r', 10)
-    .style("fill", function(d) {
-        return d._children ? "lightsteelblue" : "#fff";
-    })
-    .attr('cursor', 'pointer');
-
-
-  // Remove any exiting nodes
-  var nodeExit = node.exit().transition()
-      .duration(duration)
-      .attr("transform", function(d) {
-          return "translate(" + source.y + "," + source.x + ")";
-      })
-      .remove();
-
-  // On exit reduce the node circles size to 0
-  nodeExit.select('circle')
-    .attr('r', 1e-6);
-
-  // On exit reduce the opacity of text labels
-  nodeExit.select('text')
-    .style('fill-opacity', 1e-6);
-
-  // ****************** links section ***************************
-
-  // Update the links...
-  var link = svg.selectAll('path.link')
-      .data(links, function(d) { return d.id; });
-
-  // Enter any new links at the parent's previous position.
-  var linkEnter = link.enter().insert('path', "g")
+function update() {
+  if (nodes.length >= 10) return clearInterval(timer);
+  // Add a new node to a random parent.
+  var n = {id: nodes.length},
+      p = nodes[Math.random() * nodes.length | 0];
+  if (p.children) p.children.push(n); else p.children = [n];
+  nodes.push(n);
+  // Recompute the layout and data join.
+  node = node.data(tree.nodes(root), function(d) { return d.id; });
+  link = link.data(tree.links(nodes), function(d) { return d.source.id + "-" + d.target.id; });
+  // Add entering nodes in the parent’s old position.
+  node.enter().append("circle")
+      .attr("class", "node")
+      .attr("r", 4)
+      .attr("cx", function(d) { return d.parent.px; })
+      .attr("cy", function(d) { return d.parent.py; });
+  // Add entering links in the parent’s old position.
+  link.enter().insert("path", ".node")
       .attr("class", "link")
-      .attr('d', function(d){
-        var o = {x: source.x0, y: source.y0}
-        return diagonal(o, o)
+      .attr("d", function(d) {
+        var o = {x: d.source.px, y: d.source.py};
+        return diagonal({source: o, target: o});
       });
-
-  // UPDATE
-  var linkUpdate = linkEnter.merge(link);
-
-  // Transition back to the parent element position
-  linkUpdate.transition()
-      .duration(duration)
-      .attr('d', function(d){ return diagonal(d, d.parent) });
-
-  // Remove any exiting links
-  var linkExit = link.exit().transition()
-      .duration(duration)
-      .attr('d', function(d) {
-        var o = {x: source.x, y: source.y}
-        return diagonal(o, o)
-      })
-      .remove();
-
-  // Store the old positions for transition.
-  nodes.forEach(function(d){
-    d.x0 = d.x;
-    d.y0 = d.y;
-  });
-
-  // Creates a curved (diagonal) path from parent to the child nodes
-  function diagonal(s, d) {
-
-    path = `M ${s.y} ${s.x}
-            C ${(s.y + d.y) / 2} ${s.x},
-              ${(s.y + d.y) / 2} ${d.x},
-              ${d.y} ${d.x}`
-
-    return path
-  }
-
-  // Toggle children on click.
-  function click(d) {
-    if (d.children) {
-        d._children = d.children;
-        d.children = null;
-      } else {
-        d.children = d._children;
-        d._children = null;
-      }
-    update(d);
-  }
+  // Transition nodes and links to their new positions.
+  var t = svg.transition()
+      .duration(duration);
+  t.selectAll(".link")
+      .attr("d", diagonal);
+  t.selectAll(".node")
+      .attr("cx", function(d) { return d.px = d.x; })
+      .attr("cy", function(d) { return d.py = d.y; });
 }
 
 //Tab functions

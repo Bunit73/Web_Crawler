@@ -101,3 +101,14 @@ body{
 }
 
 /*D3 Styles*/
+  .node circle {
+		fill: #fff;
+		stroke: steelblue;
+		stroke-width: 3px;
+	}
+
+	.link {
+		fill: none;
+		stroke: #ccc;
+		stroke-width: 2px;
+	}

@@ -101,14 +101,28 @@ body{
 }
 
 /*D3 Styles*/
-  .node circle {
-		fill: #fff;
-		stroke: steelblue;
-		stroke-width: 3px;
+.node circle {
+		fill: #607D8B;
+		stroke: #455a64;
+		stroke-width: 1px;
 	}
 
-	.link {
+.link {
 		fill: none;
 		stroke: #ccc;
 		stroke-width: 2px;
 	}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    width: 10%;
+    height: 10%;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}

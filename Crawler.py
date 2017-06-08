@@ -49,7 +49,7 @@ class SearchGeneric(object):
     def print_to_console(self):
         print(self.tree.make_json())
 
-    def socket_output(self, log_string='', status='OK'):
+    def socket_output(self, log_string='', status='OK', title=''):
 
         if len(self.visited) == 1:
             start = True
@@ -64,6 +64,7 @@ class SearchGeneric(object):
             final = True
 
         node_info = self.visited[-1]
+        node_info['title'] = title
         node_info['status'] = status
 
         output = {'tree': self.tree.make_json(),
@@ -72,7 +73,8 @@ class SearchGeneric(object):
                   'status': status,
                   'new_node': node_info,
                   'final': final,
-                  'start': start
+                  'start': start,
+                  'title': title
                   }
         self.socket.emit('message', output)
 
@@ -107,6 +109,7 @@ class Breadth(SearchGeneric):
             comment = ''
             keyword_found = False
             error = False
+            title = ''
 
             url = self.queue.pop(0)
 
@@ -138,6 +141,10 @@ class Breadth(SearchGeneric):
 
                 if page_data is not None:
                     soup = BeautifulSoup(page_data.read(), "html.parser")
+                    try:
+                        title = soup.title.string
+                    except AttributeError:
+                        title = 'No title'
                     self.search_for_key_word(soup)
 
                     if self.search_for_key_word(soup):
@@ -160,11 +167,11 @@ class Breadth(SearchGeneric):
 
                     log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time, comment)
                     if error:
-                        self.socket_output(log_str, "Error")
+                        self.socket_output(log_str, "Error", title)
                     elif keyword_found:
-                        self.socket_output(log_str, "Keyword Found")
+                        self.socket_output(log_str, "Keyword Found", title)
                     else:
-                        self.socket_output(log_str)
+                        self.socket_output(log_str, '', title)
 
                 self.limit = self.limit - 1
 
@@ -193,6 +200,7 @@ class Depth(SearchGeneric):
             comment = ''
             keyword_found = False
             error = False
+            title = ''
 
             url = self.stack.pop(0)
 
@@ -221,6 +229,10 @@ class Depth(SearchGeneric):
                 if page_data is not None:
 
                     soup = BeautifulSoup(page_data.read(), "html.parser")
+                    try:
+                        title = soup.title.string
+                    except AttributeError:
+                        title = 'No title'
                     if self.search_for_key_word(soup):
                         comment = 'Keyword found'
                         keyword_found = True
@@ -242,11 +254,11 @@ class Depth(SearchGeneric):
 
                     log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time, comment)
                     if error:
-                        self.socket_output(log_str, "Error")
+                        self.socket_output(log_str, "Error", title)
                     elif keyword_found:
-                        self.socket_output(log_str, "Keyword Found")
+                        self.socket_output(log_str, "Keyword Found", title)
                     else:
-                        self.socket_output(log_str)
+                        self.socket_output(log_str, '', title)
 
                 self.limit = self.limit - 1
 

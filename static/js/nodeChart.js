@@ -1,38 +1,19 @@
-var treeData = {'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
-                'name':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
-                'children': [],
-                'status': ""
-            };
-
-var newNode = {'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
-                'name':"http://facebook.com",
-                'children': [],
-                'status': ""
-            };
-
-var newNodeB = {'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
-                'name':"http://google.com",
-                'children': [],
-                'status': ""
-            };
-
-var newNodeC = {'root':"http://google.com",
-                'name':"http://reddit.com",
-                'children': [],
-                'status': ""
-            };
+// Define the div for the tooltip
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
 //Set canvas specs
 //Set canvas size
-var margin = {top: 20, right: 100, bottom: 20, left: 80};
-var height = 620 + margin.top + margin.bottom;
-var width = 780 + margin.left + margin.right;
+var margin = {top: 40, right: 100, bottom: 20, left: 80};
+var height = 600 + margin.top + margin.bottom;
+var width = 960 + margin.left + margin.right;
 var duration = 750;
 var i = 0;
 
 
 var tree = d3.layout.tree()
-    .size([width - 20, height - 20]);
+    .size([width - 20, height - 40]);
 
 var root = {},
     nodes = tree(root);
@@ -43,7 +24,8 @@ var diagonal = d3.svg.diagonal();
 var svg = d3.select("#chart").append("svg")
     .attr("width", width)
     .attr("height", height)
-  .append("g")
+    .style("background-color","#f7f7f9")
+    .append("g")
     .attr("transform", "translate(10,10)");
 var node = svg.selectAll(".node"),
     link = svg.selectAll(".link");
@@ -56,6 +38,7 @@ function setRootData(rootNode) {
     p.root = rootNode.root;
     p.children = rootNode.children;
     p.status = rootNode.status;
+    p.title = rootNode.title;
     p.id = 0;
 }
 
@@ -90,7 +73,21 @@ function update(newNode) {
       .attr("class", "node")
       .attr("r", 4)
       .attr("cx", function(d) { return d.parent.px; })
-      .attr("cy", function(d) { return d.parent.py; });
+      .attr("cy", function(d) { return d.parent.py; })
+      .on('mouseover',function (d) {
+          console.log(d);
+          div.transition()
+                .duration(200)
+                .style("opacity", .9);
+          div.html('<b>Title:</b> ' + d.title)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
   // Add entering links in the parent’s old position.
   link.enter().insert("path", ".node")
       .attr("class", "link")
@@ -129,7 +126,22 @@ function hideChartArea() {
 }
 
 function clearChart() {
-    d3.selectAll("svg > *").remove();
+    d3.selectAll("svg").remove();
+    root = {};
+    nodes = tree(root);
+    root.parent = root;
+    root.px = root.x;
+    root.py = root.y;
+    diagonal = d3.svg.diagonal();
+    svg = d3.select("#chart").append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("background-color","#f7f7f9")
+        .append("g")
+        .attr("transform", "translate(10,10)");
+    node = svg.selectAll(".node");
+    link = svg.selectAll(".link");
+    duration = 750;
 }
 
 $(document).ready(function () {
@@ -137,22 +149,4 @@ $(document).ready(function () {
         showChartArea();
         hideTextArea();
     });
-    //console.log(nodes)
-
-    //setRootData(treeData);
-    //update(newNode);
-    //update(newNodeB);
-    //update(newNodeC);
-    //
-    // function addNode() {
-    //     update({'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
-    //         'url':"test",
-    //         'status': "OK"
-    //    });
-    // }
-
-        // setTimeout(addNode,1000);
-
-
-
 });

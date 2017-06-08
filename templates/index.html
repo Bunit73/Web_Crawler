@@ -57,8 +57,10 @@
     </div>
 	
 	<!-- Scripts for d3 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.8.0/d3.min.js" integrity="sha256-SG9O7IpJWlIha5Q8UIqaLFkkimE+CbubKlzSwTbdS1g=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js" integrity="sha256-dsOXGNHAo/syFnazt+KTBsCQeRmlcW1XKL0bCK4Baec=" crossorigin="anonymous"></script>
 
+    <!-- lodash cdn-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js" integrity="sha256-8E6QUcFg1KTnpEU8TFGhpTGHw5fJqB9vCms3OhAYLqw=" crossorigin="anonymous"></script>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/cookieParser.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/submitForm.js') }}"></script>
@@ -69,17 +71,31 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>
         <script type="text/javascript" charset="utf-8">
 
+            var startTime, endTime;
+            var timeDiff;
+
             var socket = io.connect('http://' + document.domain + ':' + location.port);
-            socket.on('connect', function(data)
-             {
-                console.log("Connected to server.");
-             });
 
             socket.on('message',function (data) {
-                console.log(data);
                 updateProgressBar(data.progress);
-                appendNewLine(data.log);
+
+                if(data.start){
+                    appendNewLine("Crawler Start");
+                    setRootData(data.new_node);
+                    startTime = new Date();
+                }
+                else{
+                    appendNewLine(data.log);
+                    update(data.new_node);
+                }
+
                 if(data.final){
+                    endTime = new Date();
+                    timeDiff = endTime - startTime;
+                    timeDiff /= 1000;
+                    Math.round(timeDiff % 60);
+                    var finishText = "Crawler Ended Elapsed Time: " + timeDiff + "sec";
+                    appendNewLine(finishText);
                     fadeProgressBar();
                     showSearchAgainBtn();
                 }

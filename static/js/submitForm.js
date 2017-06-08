@@ -30,6 +30,7 @@ function submitSearch() {
                 method:'GET',
                 data: data,
                 success: function () {
+                    clearChart();
                     socket.emit('random tree',data);
                     clearOutText();
                     fadeOutForm();

@@ -21,6 +21,7 @@ class SearchGeneric(object):
         self.limit = limit
         self.org_limit = limit
         self.visited = []
+        self.url_list = []
         self.sleep_time = 0.5
         self.socket = client_socket
 
@@ -48,7 +49,12 @@ class SearchGeneric(object):
     def print_to_console(self):
         print(self.tree.make_json())
 
-    def socket_output(self, log_string='', status='OK'):
+    def socket_output(self, log_string='', status='OK', title=''):
+
+        if len(self.visited) == 1:
+            start = True
+        else:
+            start = False
 
         if self.limit - 1 > 0:
             progress = len(self.visited)/self.org_limit * 100
@@ -57,11 +63,18 @@ class SearchGeneric(object):
             progress = 100
             final = True
 
+        node_info = self.visited[-1]
+        node_info['title'] = title
+        node_info['status'] = status
+
         output = {'tree': self.tree.make_json(),
                   'log': log_string,
                   'progress': progress,
                   'status': status,
-                  'final': final
+                  'new_node': node_info,
+                  'final': final,
+                  'start': start,
+                  'title': title
                   }
         self.socket.emit('message', output)
 
@@ -96,14 +109,17 @@ class Breadth(SearchGeneric):
             comment = ''
             keyword_found = False
             error = False
+            title = ''
 
             url = self.queue.pop(0)
 
             if self.test_url_is_absolute(url['url']) is False:
                 url['url'] = urllib.parse.urljoin(url['root'], url['url'])
 
-            if (validators.url(url['url']) is True) & (url not in self.visited):
+            if (validators.url(url['url']) is True) & (url['url'] not in self.url_list):
+                self.url_list.append(url['url'])
                 self.visited.append(url)
+
                 # change the header so sites dont kick the python header
                 req = urllib.request.Request(url['url'], data=None, headers={
                     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko)\
@@ -125,6 +141,10 @@ class Breadth(SearchGeneric):
 
                 if page_data is not None:
                     soup = BeautifulSoup(page_data.read(), "html.parser")
+                    try:
+                        title = soup.title.string
+                    except AttributeError:
+                        title = 'No title'
                     self.search_for_key_word(soup)
 
                     if self.search_for_key_word(soup):
@@ -147,11 +167,11 @@ class Breadth(SearchGeneric):
 
                     log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time, comment)
                     if error:
-                        self.socket_output(log_str, "Error")
+                        self.socket_output(log_str, "Error", title)
                     elif keyword_found:
-                        self.socket_output(log_str, "Keyword Found")
+                        self.socket_output(log_str, "Keyword Found", title)
                     else:
-                        self.socket_output(log_str)
+                        self.socket_output(log_str, '', title)
 
                 self.limit = self.limit - 1
 
@@ -180,14 +200,17 @@ class Depth(SearchGeneric):
             comment = ''
             keyword_found = False
             error = False
+            title = ''
 
             url = self.stack.pop(0)
 
             if self.test_url_is_absolute(url['url']) is False:
                 url['url'] = urllib.parse.urljoin(url['root'], url['url'])
 
-            if (validators.url(url['url']) is True) & (url not in self.visited):
+            if (validators.url(url['url']) is True) & (url['url'] not in self.url_list):
+                self.url_list.append(url['url'])
                 self.visited.append(url)
+
                 # change the header so sites dont kick the python header
                 req = urllib.request.Request(url['url'], data=None, headers={
                     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko)\
@@ -206,6 +229,10 @@ class Depth(SearchGeneric):
                 if page_data is not None:
 
                     soup = BeautifulSoup(page_data.read(), "html.parser")
+                    try:
+                        title = soup.title.string
+                    except AttributeError:
+                        title = 'No title'
                     if self.search_for_key_word(soup):
                         comment = 'Keyword found'
                         keyword_found = True
@@ -227,11 +254,11 @@ class Depth(SearchGeneric):
 
                     log_str = self.write_log(url['root'], url['url'], status_code, elapsed_time, comment)
                     if error:
-                        self.socket_output(log_str, "Error")
+                        self.socket_output(log_str, "Error", title)
                     elif keyword_found:
-                        self.socket_output(log_str, "Keyword Found")
+                        self.socket_output(log_str, "Keyword Found", title)
                     else:
-                        self.socket_output(log_str)
+                        self.socket_output(log_str, '', title)
 
                 self.limit = self.limit - 1
 

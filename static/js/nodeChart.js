@@ -1,67 +1,108 @@
-var treeData =
-    	{
-		"name" : "Top Level",
-		"children" : [
-		{
-			"name" : "Level 2 A",
-			"children" : [
-				{"name" : "A1"},
-				{"name" : "A2"}
-			]
-		},
-		{	"name" : "Level 2 B",
-			"children" : [
-				{"name" : "B1"},
-				{"name" : "B2"},
-				{"name" : "B3"}
-			]
-		},
-		{
-			"name" : "Level 2 C",
-			"children" : [{"name" : "C1"}]
-		}
-		]
-    	};
+//Based off example from: https://bl.ocks.org/mbostock/999346
+
+// Define the div for the tooltip
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
 //Set canvas specs
 //Set canvas size
-var margin = {top: 20, right: 100, bottom: 20, left: 80};
-var height = 620 + margin.top + margin.bottom;
-var width = 780 + margin.left + margin.right;
+var margin = {top: 40, right: 100, bottom: 20, left: 80};
+var height = 600 + margin.top + margin.bottom;
+var width = 960 + margin.left + margin.right;
 var duration = 750;
 
-// append the svg obgect to the body of the page
-// appends a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
+var tree = d3.layout.tree()
+    .size([width - 20, height - 40]);
+
+var root = {},
+    nodes = tree(root);
+root.parent = root;
+root.px = root.x;
+root.py = root.y;
+var diagonal = d3.svg.diagonal();
 var svg = d3.select("#chart").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .style("background-color","#f7f7f9");
+    .attr("width", width)
+    .attr("height", height)
+    .style("background-color","#f7f7f9")
+    .append("g")
+    .attr("transform", "translate(10,10)");
+var node = svg.selectAll(".node"),
+    link = svg.selectAll(".link");
 
-// append the svg to the html chrt
-var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-//make the tree map object
-var treemap = d3.tree().size([width,height]);
+function setRootData(rootNode) {
+    var p = nodes[0];
+    p.url = rootNode.url;
+    p.root = rootNode.root;
+    p.children = rootNode.children;
+    p.status = rootNode.status;
+    p.title = rootNode.title;
+    p.id = 0;
+}
 
-//links the data
-var nodes = d3.hierarchy(treeData, function(d){
-    return d.children;
-});
+function update(newNode) {
+  newNode.id = nodes.length;
+  var n = newNode;
+  var p = nodes[0];
 
-//maps the nodes the the lay out
-nodes = treemap(nodes);
+  if(p.hasOwnProperty('url')){
+      for(var i = 0; i < nodes.length; i++){
+        if(nodes[i].url === newNode.root){
+            p = nodes[i];
+            break;
+        }
+      }
+  }
 
-//add the nodes
-// adds each node as a group
-var node = g.selectAll(".node")
-    .data(nodes.descendants())
-    .enter().append("g")
-    .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
-    .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+  if (p.children){
+    p.children.push(n);
+  }
+  else{
+    p.children = [n];
+  }
+  nodes.push(n);
+  // Recompute the layout and data join.
+  node = node.data(tree.nodes(root), function(d) { return d.id; });
+  link = link.data(tree.links(nodes), function(d) { return d.source.id + "-" + d.target.id; });
 
-// adds the circle to the node
-node.append("circle").attr("r", 10);
+  // Add entering nodes in the parent’s old position.
+  node.enter().append("circle")
+      .attr("class", "node")
+      .attr("r", 4)
+      .attr("cx", function(d) { return d.parent.px; })
+      .attr("cy", function(d) { return d.parent.py; })
+      .on('mouseover',function (d) {
+          div.transition()
+                .duration(200)
+                .style("opacity", .9);
+          div.html('<b>Title:</b> ' + d.title + '<br>' + '<b>URL:</b> ' + d.url )
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+      })
+    .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+  // Add entering links in the parent’s old position.
+  link.enter().insert("path", ".node")
+      .attr("class", "link")
+      .attr("d", function(d) {
+        var o = {x: d.source.px, y: d.source.py};
+        return diagonal({source: o, target: o});
+      });
+  // Transition nodes and links to their new positions.
+  var t = svg.transition()
+      .duration(duration);
+
+  t.selectAll(".link")
+      .attr("d", diagonal);
+
+  t.selectAll(".node")
+      .attr("cx", function(d) { return d.px = d.x; })
+      .attr("cy", function(d) { return d.py = d.y; });
+}
 
 //Tab functions
 function showChartArea() {
@@ -83,10 +124,28 @@ function hideChartArea() {
     $("#node-tab").removeClass("active-tab");
 }
 
+function clearChart() {
+    d3.selectAll("svg").remove();
+    root = {};
+    nodes = tree(root);
+    root.parent = root;
+    root.px = root.x;
+    root.py = root.y;
+    diagonal = d3.svg.diagonal();
+    svg = d3.select("#chart").append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("background-color","#f7f7f9")
+        .append("g")
+        .attr("transform", "translate(10,10)");
+    node = svg.selectAll(".node");
+    link = svg.selectAll(".link");
+    duration = 750;
+}
 
 $(document).ready(function () {
     $("#node-tab").on('click',function () {
         showChartArea();
         hideTextArea();
-    })
+    });
 });

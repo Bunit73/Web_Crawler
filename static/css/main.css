@@ -84,6 +84,7 @@ body{
     height: 700px;
     color: #212121;
     padding: 0;
+    overflow: auto;
 }
 
 .footer {

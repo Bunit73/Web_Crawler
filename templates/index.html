@@ -75,15 +75,9 @@
             var timeDiff;
 
             var socket = io.connect('http://' + document.domain + ':' + location.port);
-            socket.on('connect', function(data)
-             {
-                console.log("Connected to server.");
-             });
 
             socket.on('message',function (data) {
-                console.log(data);
                 updateProgressBar(data.progress);
-
 
                 if(data.start){
                     appendNewLine("Crawler Start");

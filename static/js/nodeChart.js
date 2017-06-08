@@ -1,3 +1,5 @@
+//Based off example from: https://bl.ocks.org/mbostock/999346
+
 // Define the div for the tooltip
 var div = d3.select("body").append("div")
     .attr("class", "tooltip")
@@ -9,8 +11,6 @@ var margin = {top: 40, right: 100, bottom: 20, left: 80};
 var height = 600 + margin.top + margin.bottom;
 var width = 960 + margin.left + margin.right;
 var duration = 750;
-var i = 0;
-
 
 var tree = d3.layout.tree()
     .size([width - 20, height - 40]);
@@ -29,8 +29,7 @@ var svg = d3.select("#chart").append("svg")
     .attr("transform", "translate(10,10)");
 var node = svg.selectAll(".node"),
     link = svg.selectAll(".link");
-var duration = 750;
-    //timer = setInterval(update, duration);
+
 
 function setRootData(rootNode) {
     var p = nodes[0];
@@ -46,8 +45,6 @@ function update(newNode) {
   newNode.id = nodes.length;
   var n = newNode;
   var p = nodes[0];
-
-  //console.log(nodes);
 
   if(p.hasOwnProperty('url')){
       for(var i = 0; i < nodes.length; i++){
@@ -68,6 +65,7 @@ function update(newNode) {
   // Recompute the layout and data join.
   node = node.data(tree.nodes(root), function(d) { return d.id; });
   link = link.data(tree.links(nodes), function(d) { return d.source.id + "-" + d.target.id; });
+
   // Add entering nodes in the parent’s old position.
   node.enter().append("circle")
       .attr("class", "node")
@@ -75,11 +73,10 @@ function update(newNode) {
       .attr("cx", function(d) { return d.parent.px; })
       .attr("cy", function(d) { return d.parent.py; })
       .on('mouseover',function (d) {
-          console.log(d);
           div.transition()
                 .duration(200)
                 .style("opacity", .9);
-          div.html('<b>Title:</b> ' + d.title)
+          div.html('<b>Title:</b> ' + d.title + '<br>' + '<b>URL:</b> ' + d.url )
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
       })
@@ -98,8 +95,10 @@ function update(newNode) {
   // Transition nodes and links to their new positions.
   var t = svg.transition()
       .duration(duration);
+
   t.selectAll(".link")
       .attr("d", diagonal);
+
   t.selectAll(".node")
       .attr("cx", function(d) { return d.px = d.x; })
       .attr("cy", function(d) { return d.py = d.y; });

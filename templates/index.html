@@ -71,6 +71,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>
         <script type="text/javascript" charset="utf-8">
 
+            var startTime, endTime;
+            var timeDiff;
+
             var socket = io.connect('http://' + document.domain + ':' + location.port);
             socket.on('connect', function(data)
              {
@@ -80,8 +83,25 @@
             socket.on('message',function (data) {
                 console.log(data);
                 updateProgressBar(data.progress);
-                appendNewLine(data.log);
+
+
+                if(data.start){
+                    appendNewLine("Crawler Start");
+                    setRootData(data.new_node);
+                    startTime = new Date();
+                }
+                else{
+                    appendNewLine(data.log);
+                    update(data.new_node);
+                }
+
                 if(data.final){
+                    endTime = new Date();
+                    timeDiff = endTime - startTime;
+                    timeDiff /= 1000;
+                    Math.round(timeDiff % 60);
+                    var finishText = "Crawler Ended Elapsed Time: " + timeDiff + "sec";
+                    appendNewLine(finishText);
                     fadeProgressBar();
                     showSearchAgainBtn();
                 }

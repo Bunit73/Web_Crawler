@@ -1,10 +1,26 @@
 var treeData = {'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
                 'name':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
                 'children': [],
-                'status': "Keyword Found"
+                'status': ""
             };
 
-var root = {};
+var newNode = {'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
+                'name':"http://facebook.com",
+                'children': [],
+                'status': ""
+            };
+
+var newNodeB = {'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",
+                'name':"http://google.com",
+                'children': [],
+                'status': ""
+            };
+
+var newNodeC = {'root':"http://google.com",
+                'name':"http://reddit.com",
+                'children': [],
+                'status': ""
+            };
 
 //Set canvas specs
 //Set canvas size
@@ -13,6 +29,7 @@ var height = 620 + margin.top + margin.bottom;
 var width = 780 + margin.left + margin.right;
 var duration = 750;
 var i = 0;
+
 
 var tree = d3.layout.tree()
     .size([width - 20, height - 20]);
@@ -30,15 +47,40 @@ var svg = d3.select("#chart").append("svg")
     .attr("transform", "translate(10,10)");
 var node = svg.selectAll(".node"),
     link = svg.selectAll(".link");
-var duration = 750,
-    timer = setInterval(update, duration);
+var duration = 750;
+    //timer = setInterval(update, duration);
 
-function update() {
-  if (nodes.length >= 10) return clearInterval(timer);
-  // Add a new node to a random parent.
-  var n = {id: nodes.length},
-      p = nodes[Math.random() * nodes.length | 0];
-  if (p.children) p.children.push(n); else p.children = [n];
+function setRootData(rootNode) {
+    var p = nodes[0];
+    p.url = rootNode.url;
+    p.root = rootNode.root;
+    p.children = rootNode.children;
+    p.status = rootNode.status;
+    p.id = 0;
+}
+
+function update(newNode) {
+  newNode.id = nodes.length;
+  var n = newNode;
+  var p = nodes[0];
+
+  //console.log(nodes);
+
+  if(p.hasOwnProperty('url')){
+      for(var i = 0; i < nodes.length; i++){
+        if(nodes[i].url === newNode.root){
+            p = nodes[i];
+            break;
+        }
+      }
+  }
+
+  if (p.children){
+    p.children.push(n);
+  }
+  else{
+    p.children = [n];
+  }
   nodes.push(n);
   // Recompute the layout and data join.
   node = node.data(tree.nodes(root), function(d) { return d.id; });
@@ -86,6 +128,9 @@ function hideChartArea() {
     $("#node-tab").removeClass("active-tab");
 }
 
+function clearChart() {
+    d3.selectAll("svg > *").remove();
+}
 
 $(document).ready(function () {
     $("#node-tab").on('click',function () {
@@ -94,7 +139,10 @@ $(document).ready(function () {
     });
     //console.log(nodes)
 
-    //update();
+    //setRootData(treeData);
+    //update(newNode);
+    //update(newNodeB);
+    //update(newNodeC);
     //
     // function addNode() {
     //     update({'root':"http://web.engr.oregonstate.edu/~mjb/cs575e/",

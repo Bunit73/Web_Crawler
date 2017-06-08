@@ -21,6 +21,7 @@ class SearchGeneric(object):
         self.limit = limit
         self.org_limit = limit
         self.visited = []
+        self.url_list = []
         self.sleep_time = 0.5
         self.socket = client_socket
 
@@ -50,6 +51,11 @@ class SearchGeneric(object):
 
     def socket_output(self, log_string='', status='OK'):
 
+        if len(self.visited) == 1:
+            start = True
+        else:
+            start = False
+
         if self.limit - 1 > 0:
             progress = len(self.visited)/self.org_limit * 100
             final = False
@@ -65,7 +71,8 @@ class SearchGeneric(object):
                   'progress': progress,
                   'status': status,
                   'new_node': node_info,
-                  'final': final
+                  'final': final,
+                  'start': start
                   }
         self.socket.emit('message', output)
 
@@ -106,8 +113,10 @@ class Breadth(SearchGeneric):
             if self.test_url_is_absolute(url['url']) is False:
                 url['url'] = urllib.parse.urljoin(url['root'], url['url'])
 
-            if (validators.url(url['url']) is True) & (url not in self.visited):
+            if (validators.url(url['url']) is True) & (url['url'] not in self.url_list):
+                self.url_list.append(url['url'])
                 self.visited.append(url)
+
                 # change the header so sites dont kick the python header
                 req = urllib.request.Request(url['url'], data=None, headers={
                     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko)\
@@ -190,8 +199,10 @@ class Depth(SearchGeneric):
             if self.test_url_is_absolute(url['url']) is False:
                 url['url'] = urllib.parse.urljoin(url['root'], url['url'])
 
-            if (validators.url(url['url']) is True) & (url not in self.visited):
+            if (validators.url(url['url']) is True) & (url['url'] not in self.url_list):
+                self.url_list.append(url['url'])
                 self.visited.append(url)
+
                 # change the header so sites dont kick the python header
                 req = urllib.request.Request(url['url'], data=None, headers={
                     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko)\

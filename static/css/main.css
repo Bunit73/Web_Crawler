@@ -1,4 +1,8 @@
 /*https://material.io/guidelines/style/color.html*/
+*{
+    font-family: 'Droid Sans', sans-serif;
+}
+
 .nav-header{
     background-color: #263238;
 }
@@ -88,8 +92,19 @@ body{
 }
 
 .footer{
+    padding-top: 15px;
     background-color: #455A64 !important;
     color: #FFFFFF;
+    text-align: center;
+}
+
+.footer a{
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.footer ul{
+    list-style-type: none;
 }
 
 .has-error{

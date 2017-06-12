@@ -72,8 +72,8 @@ def cookie_handler():
         return response
 
     # amount of pages
-    if num < 1 or num > 150:
-        response = app.make_response('Invalid Pick A Number Between 1-150')
+    if num < 1 or num > 125:
+        response = app.make_response('Invalid Pick A Number Between 1-125')
         response.status_code = 400
         return response
 
@@ -120,7 +120,7 @@ def cookie_handler():
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return 'This page does not exist', 404
+    return '404 - This Page Does Not Exist', 404
 
 
 # Socket IO Listeners
@@ -145,4 +145,4 @@ def handle_numbers(obj=None):
 
 
 if __name__ == "__main__":
-    io.run(app, 'localhost', 5000, debug=True)
+    io.run(app, 'localhost', 5000, debug=False)

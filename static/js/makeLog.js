@@ -1,7 +1,7 @@
 /**
- * Sends a list of strings to the server to create a text file
+ * Creates a text file from the log information
  *
- * @param {object} list of string
+ * @param {object} textList array of string
  */
 function makeTextLog(textList) {
     var errorFlag = 0;
@@ -25,9 +25,24 @@ function makeTextLog(textList) {
     }
 }
 
+/**
+ * Crates a .json file that has has the tree data
+ *
+ * @param {object} json object
+ * @param {string} fileName name of a file
+ */
+function makeJSONFile(json,fileName) {
+    var text = JSON.stringify(json);
+    var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, fileName);
+}
+
+
 $(document).ready(function () {
     $("#exportLogBtn").on('click',function () {
-        //console.log("submitted text log");
         makeTextLog(textLog);
+    });
+    $("#exportJsonBtn").on('click',function () {
+        makeJSONFile(globalData.tree, "crawlertree.json");
     })
 });

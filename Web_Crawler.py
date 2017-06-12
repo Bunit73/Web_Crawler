@@ -60,21 +60,25 @@ def cookie_handler():
 
     # Validate Inputs
     if not validators.url(url):
+        response = app.make_response('Bad URL')
         response.status_code = 400
         return response
 
     # search type
     if type not in ['Depth', 'Breadth']:
+        response = app.make_response('Bad Search Type')
         response.status_code = 400
         return response
 
     # amount of pages
-    if num < 1:
+    if num < 1 or num > 150:
+        response = app.make_response('Invalid Pick A Number Between 1-150')
         response.status_code = 400
         return response
 
     # keyword
     if keyword == '':
+        response = app.make_response('Invalid Keyword')
         response.status_code = 400
         return response
 
@@ -112,6 +116,10 @@ def cookie_handler():
 
     return response
 
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return 'This page does not exist', 404
 
 # Socket IO Listeners
 @io.on('connect')

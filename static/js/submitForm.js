@@ -37,8 +37,8 @@ function submitSearch() {
                     showProgressBar();
                     parsePastSearchesCookie();
                 },
-                error: function () {
-                    //TODO: Handle Error
+                error: function (data) {
+                    $.alert(data.responseText);
                 }
             })
         }
@@ -100,7 +100,7 @@ function validateSearchType(searchTypeInput) {
  * @return {boolean} validations passed
  */
 function validateMaxNum(limitInput){
-    if(limitInput.val() > 0){
+    if(limitInput.val() > 0 && limitInput.val() < 151){
         limitInput.removeClass("has-error");
         return true;
     }

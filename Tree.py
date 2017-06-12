@@ -7,9 +7,6 @@ class Node(object):
         self.comment = comment
         self.children = []
 
-    def __str__(self):
-        print("FUCKER")
-
     def get_name(self):
         return self.name
 

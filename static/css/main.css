@@ -27,9 +27,9 @@ body{
     border-color: #546E7A;
 }
 
-#searchAgainBtn{
-    margin-top: 25px;
+.postSearchBtns{
     display: none;
+    margin-top: 25px;
     background-color: #546E7A;
     border-color: #546E7A;
 }

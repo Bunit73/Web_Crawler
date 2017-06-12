@@ -19,9 +19,10 @@ import validators
 import ClientSocket
 import Crawler
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
 from flask_socketio import SocketIO, emit
 from gevent import monkey
+from werkzeug.datastructures import ImmutableMultiDict
 
 # Monkey patch replaces class in the standard socket module so they can work with gevent
 # http://www.gevent.org/intro.html#beyond-sockets
@@ -38,13 +39,13 @@ app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_uppercase + string
 io = SocketIO(app, engineio_logger=True, ping_timeout=7200)
 
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     """Index Page"""
     return render_template("index.html")
 
 
-@app.route("/cookie_handler")
+@app.route("/cookie_handler", methods=['GET'])
 def cookie_handler():
     """
     Cookie Handling & From Validation
@@ -120,6 +121,7 @@ def cookie_handler():
 @app.errorhandler(404)
 def page_not_found(error):
     return 'This page does not exist', 404
+
 
 # Socket IO Listeners
 @io.on('connect')

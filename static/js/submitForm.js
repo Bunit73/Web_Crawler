@@ -124,10 +124,10 @@ function validateKeyword(keywordInput) {
 }
 
 /**
- * Fades in the search again button
+ * Fades in the post search button
  */
-function showSearchAgainBtn() {
-    $("#searchAgainBtn").fadeIn();
+function showPostSearch() {
+    $(".postSearchBtns").fadeIn();
 }
 
 /**
@@ -136,7 +136,7 @@ function showSearchAgainBtn() {
 function newSearchStart() {
     $("#searchAgainBtn").on('click',function () {
         fadeInForm();
-        $("#searchAgainBtn").hide();
+        $(".postSearchBtns").hide();
     })
 }
 

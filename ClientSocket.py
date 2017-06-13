@@ -4,7 +4,6 @@ Description:        Opens a socket for the individual client and streams
 References:
     https://github.com/miguelgrinberg/Flask-SocketIO/issues/371
 """
-from multiprocessing import Process
 
 
 class Socket:
@@ -15,14 +14,11 @@ class Socket:
     :param sid:   socket id of the client
     :param start: Start the stream to client upon creation
     """
-    def __init__(self, io, sid, start=False):
+    def __init__(self, io, sid):
         self.sid = sid
         self.io = io
         self.connected = True
 
-        if start:
-            p = Process(target=self.run())
-            p.start()
 
 
     def run(self):
@@ -36,6 +32,3 @@ class Socket:
         @:param data:  data to be sent
         """
         self.io.emit(event, data, room=self.sid)
-
-    def sleep(self, time):
-        self.io.sleep(time)

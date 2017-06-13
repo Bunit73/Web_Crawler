@@ -19,10 +19,9 @@ import validators
 import ClientSocket
 import Crawler
 
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 from gevent import monkey
-from werkzeug.datastructures import ImmutableMultiDict
 
 # Monkey patch replaces class in the standard socket module so they can work with gevent
 # http://www.gevent.org/intro.html#beyond-sockets

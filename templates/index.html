@@ -76,9 +76,11 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/nodeChart.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/updateProgressBar.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/makeLog.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/notifications.js') }}"></script>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>
-        <script type="text/javascript" charset="utf-8">
+    <!-- Socket IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
 
             var startTime, endTime, currTime;
             var timeDiff;

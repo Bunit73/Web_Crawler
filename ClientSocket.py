@@ -19,11 +19,8 @@ class Socket:
         self.io = io
         self.connected = True
 
-
-
     def run(self):
         pass
-
 
     def emit(self, event, data):
         """ 

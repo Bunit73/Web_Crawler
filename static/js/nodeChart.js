@@ -84,7 +84,11 @@ function update(newNode) {
             div.transition()
                 .duration(500)
                 .style("opacity", 0);
-        });
+        })
+    .on("click", function(d){
+        window.open(d.url,'_blank');
+    });
+
   // Add entering links in the parent’s old position.
   link.enter().insert("path", ".node")
       .attr("class", "link")

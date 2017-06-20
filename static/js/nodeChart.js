@@ -68,7 +68,16 @@ function update(newNode) {
 
   // Add entering nodes in the parent’s old position.
   node.enter().append("circle")
-      .attr("class", "node")
+      .attr('class',function (d) {
+          console.log(d.status);
+           if(d.status === 'Keyword Found'){
+               return 'keywordNode'
+           }
+           else if(d.status === 'Error'){
+               return 'errorNode'
+           }
+           return 'node';
+      })
       .attr("r", 4)
       .attr("cx", function(d) { return d.parent.px; })
       .attr("cy", function(d) { return d.parent.py; })
@@ -89,6 +98,8 @@ function update(newNode) {
         window.open(d.url,'_blank');
     });
 
+
+
   // Add entering links in the parent’s old position.
   link.enter().insert("path", ".node")
       .attr("class", "link")
@@ -103,7 +114,7 @@ function update(newNode) {
   t.selectAll(".link")
       .attr("d", diagonal);
 
-  t.selectAll(".node")
+  t.selectAll("circle")
       .attr("cx", function(d) { return d.px = d.x; })
       .attr("cy", function(d) { return d.py = d.y; });
 }

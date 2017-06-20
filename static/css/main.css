@@ -117,11 +117,17 @@ body{
 }
 
 /*D3 Styles*/
-.node circle {
-		fill: #607D8B;
-		stroke: #455a64;
-		stroke-width: 1px;
+.node{
+		fill: #000000;
 	}
+
+.keywordNode{
+        fill: #f0ad4e
+}
+
+.errorNode{
+        fill: #a94442
+}
 
 .link {
 		fill: none;

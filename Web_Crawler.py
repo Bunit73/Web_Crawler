@@ -126,6 +126,11 @@ def page_not_found(error):
     return '404 - This Page Does Not Exist', 404
 
 
+@app.errorhandler(500)
+def page_not_found(error):
+    return '500 - Internal Server Error', 500
+
+
 # Socket IO Listeners
 @io.on('connect')
 def connected():

@@ -20,6 +20,7 @@ import ClientSocket
 import Crawler
 
 from flask import Flask, render_template, request
+from flask_compress import Compress
 from flask_socketio import SocketIO, emit
 from gevent import monkey
 
@@ -28,6 +29,9 @@ from gevent import monkey
 monkey.patch_all()
 
 app = Flask(__name__)
+
+# compress responses with gzip
+Compress(app)
 
 # make a random secret thats between 10 and 20 chars long
 # http://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python

@@ -32,3 +32,6 @@ class Socket:
         @:param data:  data to be sent
         """
         self.io.emit(event, data, room=self.sid)
+
+    def sleep(self, time):
+        self.io.sleep(time)

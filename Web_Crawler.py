@@ -153,4 +153,4 @@ def handle_numbers(obj=None):
 
 
 if __name__ == "__main__":
-    io.run(app, 'localhost', 5000, debug=False)
+    io.run(app, '0.0.0.0', 5000, debug=False)

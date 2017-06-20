@@ -23,7 +23,7 @@ class Socket:
 
     def run(self):
         pass
-        """ Creates a random n-ary tree for 30 seconds"""
+
 
     def emit(self, event, data):
         """ 

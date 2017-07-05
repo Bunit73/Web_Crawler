@@ -70,13 +70,9 @@
     <!-- file saver cdn -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/cookieParser.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/submitForm.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/updateTextArea.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/nodeChart.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/updateProgressBar.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/makeLog.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/notifications.min.js') }}"></script>
+    {% assets "js_all" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 
     <!-- Socket IO -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>

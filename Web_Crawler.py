@@ -20,6 +20,7 @@ import ClientSocket
 import Crawler
 
 from flask import Flask, render_template, request
+from flask_assets import Environment, Bundle
 from flask_compress import Compress
 from flask_socketio import SocketIO, emit
 from gevent import monkey
@@ -30,8 +31,12 @@ monkey.patch_all()
 
 app = Flask(__name__)
 
-# compress responses with gzip
-Compress(app)
+# cache static items
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 5000
+assets = Environment(app)
+js = Bundle('js/cookieParser.min.js', 'js/makeLog.min.js', 'js/nodeChart.min.js', 'js/notifications.min.js',
+            'js/submitForm.min.js', 'js/updateProgressBar.min.js', 'js/updateTextArea.min.js',  output='gen/packed.js')
+assets.register('js_all', js)
 
 # make a random secret thats between 10 and 20 chars long
 # http://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
@@ -40,6 +45,9 @@ app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_uppercase + string
 
 # Wrap the flask app with the flask socket io
 io = SocketIO(app, engineio_logger=True, ping_timeout=7200)
+
+# compress responses with gzip
+Compress(app)
 
 
 @app.route('/', methods=['GET'])

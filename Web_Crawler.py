@@ -50,6 +50,12 @@ io = SocketIO(app, engineio_logger=True, ping_timeout=7200)
 Compress(app)
 
 
+@app.after_request
+def add_header(response):
+    response.cache_control.max_age = 3000
+    return response
+
+
 @app.route('/', methods=['GET'])
 def index():
     """Index Page"""

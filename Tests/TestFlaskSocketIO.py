@@ -51,12 +51,15 @@ class TestFlaskRoutes(unittest.TestCase):
         self.assertEqual(result.status_code, 400)
 """
 
+
 class TestFlaskSocketIO(unittest.TestCase):
     """Test Flask Socket IO Functionality"""
+
     def setUp(self):
         self.app = Flask(__name__)
-        self.app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
-                                   for _ in range(random.randrange(10, 20, 1)))
+        self.app.config['SECRET_KEY'] = ''.join(
+            random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
+            for _ in range(random.randrange(10, 20, 1)))
         self.io = SocketIO(self.app)
 
         self.disconnected = False

@@ -15,6 +15,7 @@ class SearchGeneric(object):
     """
     Generic Crawler Class
     """
+
     def __init__(self, root_url, limit=1, keyword='', client_socket=None):
         self.root_url = root_url
         self.keyword = keyword
@@ -43,7 +44,8 @@ class SearchGeneric(object):
                                                                                     elapsed_time)
         else:
             log_str = "Root: {}  --> Child: {}  Status: {} Elapsed Time: {} Note: {}".format(root_url, current_url,
-                                                                                    status_code, elapsed_time, comment)
+                                                                                             status_code, elapsed_time,
+                                                                                             comment)
 
         return log_str
 
@@ -58,7 +60,7 @@ class SearchGeneric(object):
             start = False
 
         if self.limit - 1 > 0:
-            progress = len(self.visited)/self.org_limit * 100
+            progress = len(self.visited) / self.org_limit * 100
             final = False
         else:
             progress = 100
@@ -100,6 +102,7 @@ class Breadth(SearchGeneric):
     """
     Breadth Crawler
     """
+
     def __init__(self, root_url, limit, keyword, socket):
         super().__init__(root_url, limit, keyword, socket)
         self.queue = [{'root': root_url, 'url': root_url}]
@@ -195,6 +198,7 @@ class Depth(SearchGeneric):
     """
     Depth Crawler
     """
+
     def __init__(self, root_url, limit, keyword, socket):
         super().__init__(root_url, limit, keyword, socket)
         self.stack = [{'root': root_url, 'url': root_url}]
@@ -253,7 +257,6 @@ class Depth(SearchGeneric):
                     # add links to queue
                     for link in soup.find_all('a', href=True):
                         self.stack.insert(0, {'root': url['url'], 'url': link['href']})
-
 
                 # append the node to the tree
                 self.append_node(url['root'], url['url'], comment)

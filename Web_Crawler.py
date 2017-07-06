@@ -13,9 +13,11 @@ References:
 import random
 import string
 import json
+import socket
+import sys
+
 
 import validators
-import socket
 
 import ClientSocket
 import Crawler
@@ -53,6 +55,8 @@ Compress(app)
 # set time out (sec)
 socket.setdefaulttimeout(10)
 
+# set recursion limit
+# sys.setrecursionlimit(175)
 
 @app.after_request
 def add_header(response):

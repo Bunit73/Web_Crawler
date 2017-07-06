@@ -38,7 +38,8 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1440000
 assets = Environment(app)
 js = Bundle('js/cookieParser.min.js', 'js/makeLog.min.js', 'js/nodeChart.min.js', 'js/notifications.min.js',
-            'js/submitForm.min.js', 'js/updateProgressBar.min.js', 'js/updateTextArea.min.js',  output='gen/packed.js')
+            'js/submitForm.min.js', 'js/updateProgressBar.min.js', 'js/updateTextArea.min.js',  'js/socketIOconn.min.js',
+            output='gen/packed.js')
 assets.register('js_all', js)
 
 # make a random secret thats between 10 and 20 chars long

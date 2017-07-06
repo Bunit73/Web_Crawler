@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="container">
-      <div class="row progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%" id="progress-bar-row"></div>
+      <div class="row progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0" id="progress-bar-row"></div>
       <div class="row justify-content-md-center">
           <button id="searchAgainBtn" class="btn btn-primary col-xs-2 col-sm-2 postSearchBtns">Start A New Search</button>
           <span class="col-xs-1 col-sm-1"></span>
@@ -70,55 +70,11 @@
     <!-- file saver cdn -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
 
+    <!-- Socket IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>
     {% assets "js_all" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
-
-    <!-- Socket IO -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.slim.min.js" integrity="sha256-1R5guYd/H+WEatv0fPVrVqIvu/4ntv7G0Fa5ooY+24g=" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
-
-            var startTime, endTime, currTime;
-            var timeDiff;
-            var globalData;
-            var textLog = [];
-
-            var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-            socket.on('message',function (data) {
-                globalData = data;
-
-                updateProgressBar(data.progress);
-
-                if(data.start){
-                    appendNewLine("Crawler Start");
-                    currTime = new Date();
-                    textLog.push(currTime + ": Crawler Stared");
-                    setRootData(data.new_node);
-                    startTime = new Date();
-                }
-                else{
-                    currTime = new Date();
-                    textLog.push(currTime + ": " + data.log);
-                    appendNewLine(data.log);
-                    update(data.new_node);
-                }
-
-                if(data.final){
-                    currTime = new Date();
-                    textLog.push(currTime + ": Crawler Finished");
-                    endTime = new Date();
-                    timeDiff = endTime - startTime;
-                    timeDiff /= 1000;
-                    Math.round(timeDiff % 60);
-                    var finishText = "Crawler Ended Elapsed Time: " + timeDiff + "sec";
-                    appendNewLine(finishText);
-                    fadeProgressBar();
-                    showPostSearch();
-                }
-            })
-
-        </script>
 
 {% endblock %}
 		

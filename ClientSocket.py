@@ -12,7 +12,6 @@ class Socket:
     to 
     :param io:    flask io app
     :param sid:   socket id of the client
-    :param start: Start the stream to client upon creation
     """
     def __init__(self, io, sid):
         self.sid = sid

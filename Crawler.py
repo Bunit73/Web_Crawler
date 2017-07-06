@@ -15,6 +15,7 @@ class SearchGeneric(object):
     """
     Generic Crawler Class
     """
+
     def __init__(self, root_url, limit=1, keyword='', client_socket=None):
         self.root_url = root_url
         self.keyword = keyword
@@ -29,21 +30,24 @@ class SearchGeneric(object):
     def validate_url(self):
         return validators.url(self.root_url)
 
-    def test_url_is_absolute(self, url):
-        return bool(urllib.parse.urlparse(url).netloc)
-
     def append_node(self, root, child, comment=''):
         if root != child:
             self.tree.add_to_tree(root, child, comment)
 
-    def write_log(self, root_url=None, current_url=None, status_code=404, elapsed_time=0, comment=''):
+    @staticmethod
+    def test_url_is_absolute(url):
+        return bool(urllib.parse.urlparse(url).netloc)
+
+    @staticmethod
+    def write_log(root_url=None, current_url=None, status_code=404, elapsed_time=0, comment=''):
         """Creates log string"""
         if comment == '':
             log_str = "Root: {}  --> Child: {}  Status: {} Elapsed Time: {}".format(root_url, current_url, status_code,
                                                                                     elapsed_time)
         else:
             log_str = "Root: {}  --> Child: {}  Status: {} Elapsed Time: {} Note: {}".format(root_url, current_url,
-                                                                                    status_code, elapsed_time, comment)
+                                                                                             status_code, elapsed_time,
+                                                                                             comment)
 
         return log_str
 
@@ -58,7 +62,7 @@ class SearchGeneric(object):
             start = False
 
         if self.limit - 1 > 0:
-            progress = len(self.visited)/self.org_limit * 100
+            progress = len(self.visited) / self.org_limit * 100
             final = False
         else:
             progress = 100
@@ -100,8 +104,9 @@ class Breadth(SearchGeneric):
     """
     Breadth Crawler
     """
-    def __init__(self, root_url, limit, keyword, socket):
-        super().__init__(root_url, limit, keyword, socket)
+
+    def __init__(self, root_url, limit, keyword, client_socket):
+        super().__init__(root_url, limit, keyword, client_socket)
         self.queue = [{'root': root_url, 'url': root_url}]
 
     def search(self, emit=None):
@@ -195,8 +200,9 @@ class Depth(SearchGeneric):
     """
     Depth Crawler
     """
-    def __init__(self, root_url, limit, keyword, socket):
-        super().__init__(root_url, limit, keyword, socket)
+
+    def __init__(self, root_url, limit, keyword, client_socket):
+        super().__init__(root_url, limit, keyword, client_socket)
         self.stack = [{'root': root_url, 'url': root_url}]
 
     def search(self, emit=None):
@@ -253,7 +259,6 @@ class Depth(SearchGeneric):
                     # add links to queue
                     for link in soup.find_all('a', href=True):
                         self.stack.insert(0, {'root': url['url'], 'url': link['href']})
-
 
                 # append the node to the tree
                 self.append_node(url['root'], url['url'], comment)

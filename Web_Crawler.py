@@ -33,7 +33,7 @@ monkey.patch_all()
 app = Flask(__name__)
 
 # cache static items
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 5000
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1440000
 assets = Environment(app)
 js = Bundle('js/cookieParser.min.js', 'js/makeLog.min.js', 'js/nodeChart.min.js', 'js/notifications.min.js',
             'js/submitForm.min.js', 'js/updateProgressBar.min.js', 'js/updateTextArea.min.js',  output='gen/packed.js')

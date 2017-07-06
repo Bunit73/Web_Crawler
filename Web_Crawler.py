@@ -15,6 +15,7 @@ import string
 import json
 
 import validators
+import socket
 
 import ClientSocket
 import Crawler
@@ -48,6 +49,9 @@ io = SocketIO(app, engineio_logger=True, ping_timeout=7200)
 
 # compress responses with gzip
 Compress(app)
+
+# set time out (sec)
+socket.setdefaulttimeout(10)
 
 
 @app.after_request

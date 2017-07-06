@@ -6,6 +6,7 @@ import urllib.error
 from time import sleep, time
 
 import validators
+import socket
 
 import Tree
 
@@ -134,6 +135,10 @@ class Breadth(SearchGeneric):
                     page_data = None
                     comment = 'Denied Access'
                     error = True
+                except socket.timeout:
+                    page_data = None
+                    comment = 'Page took longer than 10 sec to respond'
+                    error = True
                 except:
                     page_data = None
                     comment = 'Error Accessing Page'
@@ -224,6 +229,14 @@ class Depth(SearchGeneric):
                 except urllib.error.HTTPError:
                     page_data = None
                     comment = 'Denied Access'
+                    error = True
+                except socket.timeout:
+                    page_data = None
+                    comment = 'Page took longer than 10 sec to respond'
+                    error = True
+                except:
+                    page_data = None
+                    comment = 'Error Accessing Page'
                     error = True
 
                 if page_data is not None:

@@ -69,7 +69,6 @@ function update(newNode) {
   // Add entering nodes in the parent’s old position.
   node.enter().append("circle")
       .attr('class',function (d) {
-          console.log(d.status);
            if(d.status === 'Keyword Found'){
                return 'keywordNode'
            }
